@@ -303,3 +303,27 @@ A regra mais importante ao desenvolver aplicações Node.js é não bloquear o l
 
 Primeiro define-se o que é uma thread. Segundo Teixeira (2013) uma thread é uma linha de processo que compartilha a memória de um processo com todas outras threads que existem dentro do mesmo processo. Na prática o que isso significa é que se o processador do computador é por exemplo quad-core, ou seja tem quatro núcleos então ele tem quatro processos executando ao mesmo tempo, e dentro de cada um desses processos podem existir várias threads (várias linhas de processo).
 
+De uma maneira simplificada pode-se dizer que um bloqueio ocorre quando operações intensas (em relação ao tempo de execução) são realizadas de forma contínua (de uma vez só), ou seja, enquanto a operação não é finalizada outras tarefas pendentes não tem uma oportunidade de executar. Segundo o site oficial do Node.js existem duas motivações principais para não bloquear uma thread de um servidor web: a performance (requisições atendidas por segundo), que é muito maior quando a thread executa apenas tarefas rápidas; e a segurança, pois se for possível bloquear a thread com alguma requisição ou input malicioso, isso cria uma vulnerabilidade que pode ser explorada e causar uma negação de serviço.
+
+Ryan Dahl(2018) diz que quando ele criou o Node.js, seu objetivo principal era criar uma ferramenta na qual fosse possível desenvolver servidores web não bloqueantes acionados por eventos. Esse tipo de servidor tem melhor performance em aplicações focadas em entrada e saída de dados, Input e Output (I/O), pois não bloqueiam a thread. Até então a maioria dos servidores web eram do tipo baseado em processos, como por exemplo o popular Apache, esse tipo de servidor bloqueia a thread, e por isso usa múltiplas threads para atender vários clientes.
+
+A princípio pode parecer que criar várias threads faz a aplicação ser mais rápida, porém segundo Casciaro e Mammino (2016) existem dois pontos fracos nesse tipo de servidor. O primeiro é o fato de que para cada requisição uma nova thread é criada. E na maior parte do tempo essas threads estão em estado de espera (idle), aguardando I/O do cliente. Isso é ruim pois a criação de threads não é uma operação barata, usa memória e mudanças de contexto. E criar uma thread para realizar uma tarefa simples, deixando-a a maior parte do tempo em estado de espera, não proporciona benefícios, em termos de tempo, no final das contas. O segundo ponto fraco é que cada um dessas threads é bloqueante, ou seja, ela espera uma operação finalizar para poder iniciar outra. No caso de todas ou a maioria das threads do seu servidor estarem ocupados por clientes realizando operações bloqueantes, outros clientes não conseguem usar sua aplicação, gerando uma negação de serviço. Esse tipo de processamento é chamado de paralelo, pois várias operações são realizadas ao mesmo tempo em processos diferentes.
+
+Os autores também explicam que em um servidor com apenas uma thread não bloqueante, essa thread quase nunca fica em estado de espera, sempre há operações a serem realizadas. O importante é que essas operações não sejam bloqueantes, ou seja, sejam rápidas. Nesse caso o processo é chamado de simultâneo, pois as funções são divididas em tarefas menores e são realizadas intercaladamente, minimizando o tempo de estado de espera, dando ao usuário a sensação de que foram realizadas ao mesmo tempo. As figuras a seguir ilustram servidores com várias threads em comparação com servidores de apenas uma thread.
+
+
+#### Figura 1: Diagrama de um servidor multi-threaded bloqueante
+
+![multi-threaded](/img/1.png)
+
+##### Fonte: Casciaro e Mammino (2016)
+
+
+#### Figura 2: Diagrama de um servidor single-threaded não bloqueante
+
+![multi-threaded](/img/2.png)
+
+##### Fonte: Casciaro e Mammino (2016)
+
+
+Como observa-se nas Figuras 1 e 2, no servidor multi-threaded bloqueante as threads ficam muito tempo no estado de espera (idle), ou seja, ocupando recursos no processador sem realizar nenhuma tarefa. Enquanto no servidor single-threaded não bloqueante, como pode ser observado na Figura 2, o tempo em idle é bem menor, ou seja, não desperdiça muitos recursos de processadores, deixando-os livres para realizar outras tarefas, como por exemplo as funções executadas pelo kernel e pelo o Work Pool, que são discutidas na próxima seção.
