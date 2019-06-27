@@ -45,27 +45,49 @@ Este trabalho apresenta algumas das principais vulnerabilidades de negação de 
 
 
 Figura 1 - Diagrama de um servidor multi-threaded bloqueante
+
 Figura 2 - Diagrama de um servidor single-threaded não bloqueante
+
 Figura 3 - Diagrama do loop de eventos
+
 Figura 4 - Lendo um arquivo usando buffer
+
 Figura 5 - Lendo um arquivo usando stream
+
 Figura 6 - Arquivo zipSync.js
+
 Figura 7 - Arquivo zipAsync.js
+
 Figura 8 - Arquivo zipStream.js
+
 Figura 9 - Execução das três implementações da aplicação
+
 Figura 10 - Comando npm audit em uma aplicação com vulnerabilidades conhecidas
+
 Figura 11 - Comando npm audit em uma aplicação sem vulnerabilidades conhecidas
+
 Figura 12 - Comando snyk test em uma aplicação com vulnerabilidades conhecidas
+
 Figura 13 - Comandos snyk test e snyk monitor em aplicação sem vulnerabilidades conhecidas
+
 Figura 14 - Exemplo de uso da biblioteca express-rate-limit
+
 Figura 15 - Lista de processos iniciados com o comando pm2 start
+
 Figura 16 - Exemplo de uso do pacote Helmet
+
 Figura 17 - Configuração padrão do Helmet
+
 Figura 18 - Exemplo de uso de expressão regular (arquivo regex.js)
+
 Figura 19 - Resultado da execução do arquivo regex.js
+
 Figura 20 - Exemplo de aplicação com expressão regular vulnerável
+
 Figura 21 - Usando a aplicação com uma entrada válida
+
 Figura 22 - Usando a aplicação com uma entrada maliciosa
+
 Figura 23 – Arquivo crono.js
 
 
@@ -161,3 +183,6 @@ XSS Cross-Site Scripting
 [Referências Bibliográficas]()
 
 [Apêndice A]()
+
+
+
