@@ -312,18 +312,18 @@ A princípio pode parecer que criar várias threads faz a aplicação ser mais r
 Os autores também explicam que em um servidor com apenas uma thread não bloqueante, essa thread quase nunca fica em estado de espera, sempre há operações a serem realizadas. O importante é que essas operações não sejam bloqueantes, ou seja, sejam rápidas. Nesse caso o processo é chamado de simultâneo, pois as funções são divididas em tarefas menores e são realizadas intercaladamente, minimizando o tempo de estado de espera, dando ao usuário a sensação de que foram realizadas ao mesmo tempo. As figuras a seguir ilustram servidores com várias threads em comparação com servidores de apenas uma thread.
 
 
-#### Figura 1: Diagrama de um servidor multi-threaded bloqueante
+##### Figura 1: Diagrama de um servidor multi-threaded bloqueante
 
 ![multi-threaded](/img/1.png)
 
-##### Fonte: Casciaro e Mammino (2016)
+*Fonte: Casciaro e Mammino (2016)*
 
 
-#### Figura 2: Diagrama de um servidor single-threaded não bloqueante
+##### Figura 2: Diagrama de um servidor single-threaded não bloqueante
 
 ![single-threaded](/img/2.png)
 
-##### Fonte: Casciaro e Mammino (2016)
+*Fonte: Casciaro e Mammino (2016)*
 
 
 Como observa-se nas Figuras 1 e 2, no servidor multi-threaded bloqueante as threads ficam muito tempo no estado de espera (idle), ou seja, ocupando recursos no processador sem realizar nenhuma tarefa. Enquanto no servidor single-threaded não bloqueante, como pode ser observado na Figura 2, o tempo em idle é bem menor, ou seja, não desperdiça muitos recursos de processadores, deixando-os livres para realizar outras tarefas, como por exemplo as funções executadas pelo kernel e pelo o Work Pool, que são discutidas na próxima seção.
@@ -337,11 +337,11 @@ O loop de eventos é o que permite aplicações Node.js realizarem operações n
 A libuv é uma biblioteca desenvolvida na linguagem C, originalmente foi desenvolvida exclusivamente para possibilitar a natureza single-threaded não bloqueante do Node.js, hoje também é utilizada em outras plataformas. Ela é a responsável pela criação do loop de eventos, do worker pool e de várias funções assíncronas (funções não bloqueantes, discutidas na próxima seção) não disponíveis no kernel dos sistemas operacionais. Na figura 3 mostra-se um diagrama que representa o loop de eventos, baseado na palestra de Belder (2016), um dos desenvolvedores do Node.js e da biblioteca libuv.
 
 
-#### Figura 3: Diagrama do loop de eventos
+##### Figura 3: Diagrama do loop de eventos
 
 ![loop-de-eventos](/img/3.png)
 
-##### Fonte: Adaptado de Belder (2016)
+*Fonte: Adaptado de Belder (2016)*
 
 
 Primeiro nota-se as três entidades fora do loop de eventos: Time Heap; Kernel; e Worker Pool. Cada uma delas é responsável por realizar determinados tipos de tarefas, segundo Belder (2016), a principal característica em comum é o número de referências, que nada mais é que o número de tarefas que aquela entidade está realizando ou está aguardando para realizar. Observa-se a seguir quais tipos de tarefa é responsabilidade de cada uma dessas entidades.
@@ -405,18 +405,18 @@ Em Node.js streams podem ser de quatro tipos: Readable, Writeable, Duplex e Tran
 Segundo Casciaro e Mammino (2016), streams podem ser encadeadas, semelhante às promises, a diferença é que no caso das promises uma operação da cadeia deve ser finalizada para que a próxima comece, já com streams cada pedaço que passa por uma operação já é enviado e pode ser processado pela próxima operação. As Figuras 4 e 5 esclarecem essa diferença.
 
 
-#### Figura 4: Lendo um arquivo usando buffer
+##### Figura 4: Lendo um arquivo usando buffer
 
 ![buffer](/img/4.png)
 
-##### Fonte: Casciaro e Mammino (2016)
+*Fonte: Casciaro e Mammino (2016)*
 
 
-#### Figura 5: Lendo um arquivo usando stream
+##### Figura 5: Lendo um arquivo usando stream
 
 ![stream](/img/5.png)
 
-##### Fonte: Casciaro e Mammino (2016)
+*Fonte: Casciaro e Mammino (2016)*
 
 
 Observa-se no primeiro passo da Figura 4 que uma parte do arquivo é lida e armazenada no buffer da memória, no segundo passo a leitura do arquivo é finalizada e todo conteúdo contido no buffer da memória é enviado à próxima operação. Enquanto na Figura 5 nota-se que no primeiro passo, assim que parte do arquivo está na memória, já é enviada para próxima operação, e no segundo passo a outra parte do arquivo é lida e enviada para próxima operação.
@@ -430,25 +430,25 @@ Segundo Casciaro e Mammino (2016), em alguns casos a operação seguinte pode se
 Um exemplo prático para esclarecer as vantagens e desvantagens do uso de código síncrono, assíncrono e streams é analisado a seguir. Neste exemplo criou-se uma aplicação de linha de comando simples, que apenas lê um arquivo, o compacta, logo em seguida o descompacta e finalmente o grava. É um bom exemplo para visualizar as diferenças em performance e ordem de execução entre código síncrono, assíncrono e streams.
 
 
-#### Figura 6: Arquivo zipSync.js
+##### Figura 6: Arquivo zipSync.js
 
 ![zipSync](/img/6.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
-#### Figura 7: Arquivo zipAsync.js
+##### Figura 7: Arquivo zipAsync.js
 
 ![zipAsync](/img/7.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
-#### Figura 8: Arquivo zipStream.js
+##### Figura 8: Arquivo zipStream.js
 
 ![zipStream](/img/8.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
 Nas Figuras 6, 7 e 8 tem-se respectivamente o código fonte da nossa aplicação de três formas diferentes: síncrona, assíncrona com buffer e por último também assíncrona, porém utilizando streams. Explica-se agora os códigos fonte, linha por linha.
@@ -460,11 +460,11 @@ Entre a quinta e a última linha dos códigos fontes, são executadas funções 
 Observa-se agora, na Figura 9, o resultado da execução das três implementações de nossa aplicação utilizando o mesmo arquivo (de 346MB) como entrada.
 
 
-#### Figura 9: Execução das três implementações da aplicação
+##### Figura 9: Execução das três implementações da aplicação
 
 ![execução das aplicações](/img/9.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
 Nas três primeiras linhas observa-se o resultado da aplicação com funções síncronas, o mais importante a ser notado aqui é o fato da string “Outras Tarefas” aparecer após a finalização do cronômetro, isso significa que outras tarefas seriam bloqueadas e só executariam após o término das operações feitas no arquivo. Observa-se também que a aplicação síncrona é a mais rápida de todas como é de se esperar já que as operações no arquivo não pausam.
@@ -508,18 +508,18 @@ Outra boa prática relatada por Düüna (2016) é manter os pacotes atualizados,
 É claro que entrar nos sites acima citados e checar um por um dos pacotes usados em sua aplicação, e todas dependências deles, consumiria muito tempo. Por isso existem ferramentas para realizar essa checagem de forma rápida. O NPM conta com uma ferramenta padrão que verifica os pacotes vulneráveis, basta digitar o comando npm audit em um terminal aberto na pasta que contém seu projeto. As Figuras 10 e 11 mostram respectivamente o resultado desse comando em uma aplicação que possui um pacote com vulnerabilidades conhecidas, e em uma aplicação livre de pacotes com vulnerabilidades conhecidas.
 
 
-#### Figura 10: Comando npm audit em uma aplicação com vulnerabilidades conhecidas
+##### Figura 10: Comando npm audit em uma aplicação com vulnerabilidades conhecidas
 
 ![npm audit com vulnerabilidade](/img/10.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
-#### Figura 11: Comando npm audit em uma aplicação sem vulnerabilidades conhecidas
+##### Figura 11: Comando npm audit em uma aplicação sem vulnerabilidades conhecidas
 
 ![npm audit sem vulnerabilidade](/img/11.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
 Na Figura 10 uma vulnerabilidade foi encontrada, o comando npm audit informa o nível da vulnerabilidade como moderado. Também mostra qual o tipo da vulnerabilidade, nesse caso Denial of Service, negação de serviço. Além disso informa qual pacote possui a vulnerabilidade, de qual outro pacote ele é dependência, o caminho para o pacote vulnerável, e fornece um endereço para maiores informações. Também se mostra a vulnerabilidade já foi removida em alguma versão do pacote, nesse caso ainda não há um patch disponível.
@@ -527,18 +527,18 @@ Na Figura 10 uma vulnerabilidade foi encontrada, o comando npm audit informa o n
 A Snyk, empresa focada em encontrar e solucionar vulnerabilidades em pacotes, também possui uma ferramenta para encontrar pacotes vulneráveis em sua aplicação. Primeiro é preciso instalar a ferramenta usando npm install -g snyk. É necessário estar autenticado no site da Snyk para utilizar essa ferramenta. Depois utiliza-se o comando snyk test para procurar vulnerabilidades. E também é possível usar o comando snyk monitor, que monitora as dependências de sua aplicação e te notifica por e-mail caso novas vulnerabilidades sejam encontradas em algum pacote usado por sua aplicação. As Figuras 12 e 13 mostram, respectivamente, exemplos desses comandos em uma aplicação com vulnerabilidades conhecidas, e uma aplicação sem vulnerabilidades conhecidas.
 
 
-#### Figura 12: Comando snyk test em uma aplicação com vulnerabilidades conhecidas
+##### Figura 12: Comando snyk test em uma aplicação com vulnerabilidades conhecidas
 
 ![snyk test com vulnerabilidade](/img/12.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
-#### Figura 13: Comando snyk test e snyk monitor em uma aplicação sem vulnerabilidades conhecidas
+##### Figura 13: Comando snyk test e snyk monitor em uma aplicação sem vulnerabilidades conhecidas
 
 ![snyk test sem vulnerabilidade](/img/13.png)
 
-##### Fonte: Autoria própria
+*Fonte: Autoria própria*
 
 
 A ferramenta snyk mostra algumas informações diferentes em relação ao comando npm audit. O principal diferencial é a capacidade de monitorar as vulnerabilidades com o comando snyk monitor e receber atualizações por e-mail.
@@ -566,11 +566,11 @@ message: mensagem de erro enviada ao usuário após max ser atingido. O padrão 
 statusCode: código de estado HTTP retornado após max ser excedido, por padrão é o código 429.
 
 
-#### Figura 14: Exemplo de uso da biblioteca express-rate-limit
+##### Figura 14: Exemplo de uso da biblioteca express-rate-limit
 
 ![express-rate-limit](/img/14.png)
 
-##### Fonte: Disponível em: <https://github.com/nfriedly/express-rate-limit>. Acesso em: 03 mar. 2019
+*Fonte: Disponível em: <https://github.com/nfriedly/express-rate-limit>. Acesso em: 03 mar. 2019*
 
 
 Existem outras opções não destacadas neste trabalho. É possível encontrá-las na documentação da própria biblioteca. Como foi mostrado o express-rate-limit é um pacote muito útil para segurança em relação a ataques de negação de serviço. O seu uso é recomendado, porém para alguns tipos de aplicação podem existir pacotes mais apropriados. Na própria documentação do pacote são discutidos estes casos, por isso recomenda-se checar qual o melhor pacote para sua aplicação.
@@ -586,16 +586,16 @@ O PM2 Runtime é gratuito e de código aberto. Existem outras duas versões do P
 Para instalar o PM2 Runtime basta usar o comando npm install -g pm2. Para iniciar uma aplicação em modo de produção basta usar o comando: pm2 start app.js. Sendo app.js o ponto de entrada de sua aplicação. Com esse comando o PM2 já mantém sua aplicação executando o tempo todo, reiniciando automaticamente em caso de crash, sem tempo de inatividade. E para que a aplicação reinicie automaticamente no caso da máquina em que a aplicação reside reiniciar, basta usar o comando: pm2 startup. Para gerenciar os processos da aplicação o PM2 cria uma lista de processos, que pode ser acessada com o comando pm2 ls, como mostra a Figura 15.
 
 
-#### Figura 15: Lista de processos iniciados com o comando pm2 start
+##### Figura 15: Lista de processos iniciados com o comando pm2 start
 
 ![pm2](/img/15.png)
 
-##### Fonte: Disponível em: <https://pm2.io/doc/en/runtime/overview/>. Acesso em: 03 mar. 2019
+*Fonte: Disponível em: <https://pm2.io/doc/en/runtime/overview/>. Acesso em: 03 mar. 2019*
 
 
-Para adicionar processos a essa lista, basta usar o comando pm2 start, como já foi escrito anteriormente. Para remover processos usa-se o comando pm2 delete <nome do app>. Existem ainda outros comandos para gerenciar os processos, como por exemplo: pm2 stop; pm2 reload; pm2 restart.
+Para adicionar processos a essa lista, basta usar o comando pm2 start, como já foi escrito anteriormente. Para remover processos usa-se o comando pm2 delete `nome do app`. Existem ainda outros comandos para gerenciar os processos, como por exemplo: pm2 stop; pm2 reload; pm2 restart.
 
-Também é possível gerar arquivos de log facilmente com o PM2. Basta usar o comando pm2 logs <nome do app> para gerar logs de um processo, ou usa-se o comando pm2 logs all, para gerar logs de todos processos. Os arquivos de log são salvos na pasta ~/.pm2/logs. Existem várias opções para gerenciar logs, por exemplo: criar vários arquivos e não apenas um muito grande; apagar os arquivos de log; escolher o formato do arquivo.
+Também é possível gerar arquivos de log facilmente com o PM2. Basta usar o comando pm2 logs `nome do app` para gerar logs de um processo, ou usa-se o comando pm2 logs all, para gerar logs de todos processos. Os arquivos de log são salvos na pasta ~/.pm2/logs. Existem várias opções para gerenciar logs, por exemplo: criar vários arquivos e não apenas um muito grande; apagar os arquivos de log; escolher o formato do arquivo.
 
 Uma funcionalidade muito útil do PM2, principalmente para reduzir chances de negação de serviço, é o modo cluster. Nesse modo o PM2 cria vários processos filhos da sua aplicação e balanceia a carga entre eles. Isso aumenta a performance e reduz tempo de inatividade. Para usar essa função basta iniciar a aplicação com o comando: pm2 start app.js -i max. Sendo app.js o ponto de entrada da aplicação, e -i é a opção que controla o número de instâncias. Neste caso max significa que o PM2 detecta automaticamente o número de CPUs (Central Processing Unit) disponíveis e executa quantos processos forem possíveis. Também é possível usar um número específico no lugar de max. Nesse caso o número de instâncias será o menor entre: o número digitado na opção; e o número de CPUs disponíveis.
 
@@ -608,11 +608,11 @@ Outra função interessante do PM2 é o monitoramento direto no terminal. Basta 
 Helmet é um pacote que ajuda a deixar aplicações Node.js feitas com o framework Express mais seguras, configurando vários cabeçalhos HTTP. Ele não é voltado especificamente para proteção contra negação de serviço, e sim para vários tipos de vulnerabilidades que podem ser exploradas caso alguns cabeçalhos HTTP estejam mal configurados. O uso do Helmet é recomendado por vários profissionais, o próprio site oficial do Express recomenda. Düüna (2016) mostra como usando o Helmet e com apenas algumas linhas de código é possível se proteger de uma variedade de ataques, como mostra a Figura 16.
 
 
-#### Figura 16: Exemplo de uso do pacote Helmet
+##### Figura 16: Exemplo de uso do pacote Helmet
 
 ![helmet](/img/16.png)
 
-##### Fonte: Düüna
+*Fonte: Düüna*
 
 
 Observa-se que Düüna (2016) usa a configuração padrão do Helmet, e além disso configura o cabeçalho Content Security Policy (CPS). O CPS define de quais origens podem ser os scripts executados na aplicação. A opção self determina que apenas scripts do próprio domínio da aplicação podem executar. Isso previne ataques de Cross-Site Scripting (XSS).
@@ -622,11 +622,11 @@ Um dos cabeçalhos mais importantes configurado pelo Helmet é o cabeçalho X-Po
 A Figura 17 mostra qual a configuração padrão do Helmet, usada por Düüna (2016) em seu exemplo.
 
 
-#### Figura 17: Configuração padrão do Helmet
+##### Figura 17: Configuração padrão do Helmet
 
 ![helmet config](/img/17.png)
 
-##### Fonte: Disponível em: <https://helmetjs.github.io/>. Acesso em: 03 mar. 2019
+*Fonte: Disponível em: <https://helmetjs.github.io/>. Acesso em: 03 mar. 2019*
 
 
 Ainda no tópico de cabeçalhos HTTP, mas não relacionado ao Helmet, em 27 de novembro de 2018 foi lançado uma atualização para o Node.js que resolveu duas vulnerabilidades de negação de serviço relacionadas a cabeçalhos HTTP. A primeira consiste no fato de que antes dessa atualização os cabeçalhos podiam ter até 80 kilobytes, e após a atualização só podem ter até 8 kilobytes. Isso era um problema pois usando uma combinação de requisições com cabeçalhos de tamanho máximo era possível fazer o servidor HTTP ser interrompido. A segunda vulnerabilidade era o fato de ser possível enviar cabeçalhos HTTP de maneira bem lenta, mantendo as conexões e os recursos alocados por um tempo muito longo, causando indisponibilidade para outros usuários legítimos da aplicação. Mais detalhes sobre essa atualização, e vulnerabilidades, podem ser encontrados no site oficial do Node.js.
