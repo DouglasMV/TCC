@@ -321,9 +321,327 @@ Os autores também explicam que em um servidor com apenas uma thread não bloque
 
 #### Figura 2: Diagrama de um servidor single-threaded não bloqueante
 
-![multi-threaded](/img/2.png)
+![single-threaded](/img/2.png)
 
 ##### Fonte: Casciaro e Mammino (2016)
 
 
 Como observa-se nas Figuras 1 e 2, no servidor multi-threaded bloqueante as threads ficam muito tempo no estado de espera (idle), ou seja, ocupando recursos no processador sem realizar nenhuma tarefa. Enquanto no servidor single-threaded não bloqueante, como pode ser observado na Figura 2, o tempo em idle é bem menor, ou seja, não desperdiça muitos recursos de processadores, deixando-os livres para realizar outras tarefas, como por exemplo as funções executadas pelo kernel e pelo o Work Pool, que são discutidas na próxima seção.
+
+
+### 2.2 - O que é o Loop de Eventos
+
+
+O loop de eventos é o que permite aplicações Node.js realizarem operações não bloqueantes, ainda que o JavaScript use apenas uma thread. De forma simplificada as responsabilidades do loop de eventos são: redirecionar operações para o kernel do sistema operacional (quando possível) ou para o work pool (um local onde algumas tarefas específicas são executadas), agendar timers, receber e executar callbacks (são funções que executam após uma outra função ter finalizado). Como a maioria dos sistemas operacionais modernos tem um kernel capaz de manter várias threads, eles podem executar operações no plano de fundo quando necessário. Quando essas operações estão finalizadas elas voltam para o loop de eventos para serem executadas na aplicação Node.js. 
+
+A libuv é uma biblioteca desenvolvida na linguagem C, originalmente foi desenvolvida exclusivamente para possibilitar a natureza single-threaded não bloqueante do Node.js, hoje também é utilizada em outras plataformas. Ela é a responsável pela criação do loop de eventos, do worker pool e de várias funções assíncronas (funções não bloqueantes, discutidas na próxima seção) não disponíveis no kernel dos sistemas operacionais. Na figura 3 mostra-se um diagrama que representa o loop de eventos, baseado na palestra de Belder (2016), um dos desenvolvedores do Node.js e da biblioteca libuv.
+
+
+#### Figura 3: Diagrama do loop de eventos
+
+![loop-de-eventos](/img/3.png)
+
+##### Fonte: Adaptado de Belder (2016)
+
+
+Primeiro nota-se as três entidades fora do loop de eventos: Time Heap; Kernel; e Worker Pool. Cada uma delas é responsável por realizar determinados tipos de tarefas, segundo Belder (2016), a principal característica em comum é o número de referências, que nada mais é que o número de tarefas que aquela entidade está realizando ou está aguardando para realizar. Observa-se a seguir quais tipos de tarefa é responsabilidade de cada uma dessas entidades.
+
+Belder (2016) explica que o Time Heap tem apenas uma responsabilidade que é controlar as chamadas das funções setTimeout (executa uma função, uma única vez, após um período de tempo) e setInterval (executa uma função, várias vezes, a cada intervalo de tempo). Essas funções não são nativas da linguagem JavaScript, porém a maioria das plataformas que executam códigos JavaScript possuem uma implementação delas, como por exemplo os navegadores modernos Chrome e Firefox. O Node.js também tem sua própria implementação dessas funções. O Time Heap retorna uma função callback para o início do loop de eventos quando o tempo determinado for atingido.
+
+Belder (2016) diz que o Kernel é responsável por realizar funções como por exemplo: servidores, sockets de conexão tcp/udp, pipes, entradas de terminal, resoluções DNS (Domain Name System), entre outras. Quando o kernel finaliza essas operações, ele retorna-as ao loop de evento, mais especificamente na fase de callback pool, que se explica mais adiante.
+
+Segundo a documentação oficial do Node.js, o Worker Pool ou também chamado de Thread Pool possui uma variedade de funções assíncronas criadas pela libuv, as quais não existem uma similar no kernel que também seja assíncrona. Alguns exemplos de operações realizadas pelo Worker Pool são: pesquisa de DNS, operações no sistema de arquivo (acesso, leitura, escrita), alguns tipos excepcionais de pipes, streams, entre outros. Assim como o kernel, o Worker Pool retorna as operações finalizada para o callback pool no loop de eventos, para que sejam executadas na aplicação.
+
+Na Figura 3 nota-se cinco quadrados com “JS” escrito dentro dos mesmos, segundo Belder (2016), eles representam os momentos nos quais o loop de evento executa códigos JavaScript. São nesses momentos que referências para o Time Heap, o Kernel e o Worker Pool podem ser criadas, através da invocação de funções implementadas pelo Node.js. Agora discute-se como cada etapa do loop de eventos funciona.
+
+Belder (2016) explica que quando uma aplicação Node.js é iniciada o primeiro passo que ocorre é a leitura e execução do ponto de entrada da aplicação, representado por index.js na Figura 3. No caso de uma aplicação web é nesse momento que o kernel recebe uma referência para começar a “ouvir” requisições HTTPS (Hyper Text Transfer Protocol Secure) ou HTTP (Hyper Text Transfer Protocol).
+
+O autor ainda diz que após todo código inicial ser executado o loop entra na fase dos timers, a qual recebe as funções do Time Heap que já esperaram o tempo determinado a elas e devem ser executadas. Em seguida o loop de eventos executa essas funções recebidas.
+
+A próxima fase, a fase de pool, é a mais importante do loop. Segundo a documentação oficial do Node.js, essa é a fase que recebe callbacks do kernel e do worker pool, ela é responsável por determinar quanto tempo deve aguardar para receber callbacks, gerar uma fila dessas callbacks recebidas e executá-las na ordem FIFO (First In First Out). Caso a fila da fase pool esteja vazia e não existam callbacks aguardando em outras fases (timers, check e close), o loop de evento fica parado na fase de pool até que ela (ou a fase de timers) receba uma callback.
+
+Belder (2016) explica que após todas callbacks das fases timers e pool executarem, entra-se na fase de check, essa fase é responsável por executar callbacks chamadas por uma função de timer especial: setImmediate. Ela é especial justamente por que possui uma fase só para si, enquanto as outras funções de timers são executadas na fase de timers. O nome da função refere-se ao fato de ela ser executada imediatamente após a fase de pool.
+
+A última fase do loop é a fase chamada close. Segundo a documentação oficial do Node.js, ela tem esse nome pois é responsável por verificar se alguma callback ou socket de comunicação foi fechado abruptamente, caso isso ocorra um evento do tipo close é emitido e os recursos usados são “limpos”.
+
+Segundo Belder (2016), quando a fase close termina o loop de eventos verifica o número de referências do Time Heap, Kernel e Worker Pool, caso os três sejam iguais a zero o loop de eventos finaliza, pois se continuasse ele acabaria parando na fase de pool e nunca mais sairia de lá, já que para algum código ser executado seria necessário receber uma callback de alguma referência, e existem zero referências em todos três possíveis lugares. Existem outras duas situações em que o loop de eventos finalizaria: caso haja um erro de runtime não lidado; caso a função process.exit() seja executada em algum momento.
+
+Belder (2016) ainda explica que caso exista pelo menos uma referência em um dos três lugares possíveis (Time Heap, Kernel, Worker Pool) ao final da fase de close, o loop volta para a fase de timers e fecha o loop, ou seja, repete os passos descritos acima a partir da fase de timers. O autor enfatiza que no caso de um servidor web, como na inicialização o kernel recebe uma referência para começar a “ouvir” requisições HTTPS, essa referência sempre estará presente, por isso o servidor web não para mesmo quando não há nenhuma tarefa a ser executada.
+
+
+### 2.3 - Síncrono X Assíncrono
+
+
+Os conceitos de síncrono e assíncrono estão diretamente ligados a regra mais importante do Node.js: não bloquear o loop de eventos. Também é importante não bloquear o Worker Pool, pois ele é responsável por grande parte das tarefas que usam mais recursos do processador.
+
+De maneira simples uma função síncrona realiza todas suas tarefas em sequência e de uma vez só, o que significa que enquanto ela executa, nenhuma outra função tem sua vez na thread. Já uma função assíncrona pode realizar uma tarefa pequena (portanto rápida), pausar, liberando a thread para outra função, e continuar suas tarefas mais tarde. Segundo Casciaro e Mammino (2016) a arquitetura assíncrona e o fato do Node.js ser single-threaded, mudou a maneira com que os desenvolvedores lidam com paralelismo. Pois ao invés de criar uma nova thread para cada nova tarefa, usam funções assíncronas para dar um tempo justo para cada tarefa e reduzir o tempo em estado de espera da thread.
+
+Devido ao fato das funções assíncronas pararem sua execução regularmente, para que o loop de eventos possa checar se existem outras funções, elas levam mais tempo do que uma função síncrona para finalizar. É por isso que muitas das funções disponíveis nas bibliotecas do Node.js têm uma versão síncrona e uma versão assíncrona. Pois se essa função deve ser executada uma única vez na inicialização da aplicação, é mais vantajoso usar a versão síncrona. Porque é mais rápida, e o fato dela ser bloqueante não importa nesse caso pois na inicialização da aplicação não há requisições de clientes ainda.
+
+Segundo Simpson (2015), funções assíncronas ajudam a criar aplicações que não bloqueiam por dois motivos: primeiro porque como elas podem ser divididas em tarefas menores que não precisam ser executadas de uma vez, é possível executar outras funções entre essas tarefas; o segundo motivo é o fato de que algumas funções precisam de um tempo em idle, por exemplo para aguardar o recebimento de dados de outra aplicação, e isso pode ser feito enquanto outras funções executam. Já em uma função síncrona esse tempo de espera deixaria a thread em estado idle, ou seja, bloqueando a execução de outras tarefas.
+
+Exemplificando, em determinado momento um programa deve executar uma função que faz essencialmente duas tarefas: requisita dados de uma aplicação externa, e em seguida faz um cálculo simples com esses dados. A requisição leva 5 ms (milissegundos), e o cálculo 15 ms, porém o tempo de espera para a aplicação externa responder a requisição é de 780 ms. Se essa função for realizada de forma síncrona (bloqueante) a thread será ocupado por essa função por 800 ms e durante esse tempo nenhuma outra função poderá ser executada. Já se a função for assíncrona o programa executa a tarefa de requisição em 5 ms, retorna o controle do thread para o loop de eventos que pode realizar outras funções que estão na fila de espera e quando a aplicação externa retornar os dados (780 ms depois da requisição) uma callback com esses dados entra na fila de execução, e quando chegar sua vez é executada.
+
+Existem várias formas de escrever funções assíncronas em JavaScript, apenas quatro delas serão abordadas neste trabalho, discutidas por Simpson (2015) e Casciaro e Mammino (2016): Callbacks, Promises, Async/Await, e Generators. Segundo Simpson (2015) callbacks são a maneira mais fundamental e mais usada para escrever código assíncrono em JavaScript. Define-se, simplificadamente, callbacks como funções que são passadas como parâmetro para uma outra função e executam de após a função que as contém é executada. É importante destacar que nem toda callback é assíncrona, isso depende de como a função foi escrita.
+
+Simpson (2015) define Promise como um mecanismo facilmente repetível para encapsular e compor valores futuros. De maneira simplificada uma Promise retorna um estado e um valor, o estado pode ser pendente, resolvida ou recusada. Geralmente o estado inicial é pendente e não há valor, quando a tarefa realizada pela Promise é finalizada o estado muda para resolvida e o valor é o resultado dessa tarefa. Caso ocorra algum erro na execução da tarefa, o estado passa a ser recusada e o valor é o erro ocorrido. As vantagens de Promises é que podem ser encadeadas facilmente; lidar com erros é mais fácil; a forma de escrita é mais compreensível do que callbacks.
+
+Simpson (2015) explica que para escrever uma função assíncrona utilizando Async/Await basta utilizar a palavra reservada em JavaScript async antes da declaração de uma função, e dentro dessa função a palavra reservada await pode ser utilizada para pausar assincronamente a execução da função e aguardar uma tarefa, que quando finalizada retoma a execução da função.
+
+Simpson (2015) explica que para escrever uma função assíncrona utilizando Async/Await basta utilizar a palavra reservada em JavaScript async antes da declaração de uma função, e dentro dessa função a palavra reservada await pode ser utilizada para pausar assincronamente a execução da função e aguardar uma tarefa, que quando finalizada retoma a execução da função.
+
+O autor ainda diz que um Generator é declarado usando um asterisco (*) apoś a palavra chave function, uma função desse tipo pode ser pausada em qualquer lugar dentro de sua declaração utilizando-se a palavra reservada yield. E a execução só é retomada quando o método next() é chamado na referência desse Generator.
+
+
+### 2.4 - Streams
+
+
+Teixeira (2013) define stream como uma construção abstrata que é implementada por vários objetos do Node.js. Segundo Casciaro e Mammino (2016), em uma plataforma baseada em eventos, como Node.js, a maneira mais eficiente de lidar com entrada e saída de dados (I/O) é consumir a entrada assim que estiver disponível e enviar a saída assim que estiver pronta, e é exatamente isso que streams fazem.
+
+Segundo Casciaro e Mammino (2016) algumas funções assíncronas, apesar de não bloquearem o loop de eventos, usam um buffer para armazenar os resultados das tarefas realizadas por ela e só retornam esses resultados após todas tarefas finalizarem. Existem três problemas em usar um buffer: enquanto todas tarefas dessa função não finalizarem, a próxima função que usa esse resultado não pode iniciar; o buffer ocupa espaço na memória, caso os dados sejam muito grandes (um arquivo de vídeo por exemplo) ou vários clientes estejam usando essa função com buffer, o servidor pode ocupar toda sua memória, causando uma indisponibilidade; o buffer tem um tamanho máximo, que no Node.js é aproximadamente 1 gigabyte, se os dados excederem esse valor um erro de buffer overflow ocorre.
+
+Em Node.js streams podem ser de quatro tipos: Readable, Writeable, Duplex e Transform. Casciaro e Mammino (2016) definem uma readable stream como uma representação de uma fonte de dados, por exemplo um arquivo a ser lido. Os autores também definem uma writeable stream como uma representação de um destino de dados, como por exemplo um arquivo a ser gravado. Uma duplex stream é readable e writeable ao mesmo tempo. Já uma transform stream é um tipo especial de duplex stream, pois nela existe uma relação estabelecida entre os dados de entrada e de saída, enquanto na duplex stream essa relação não é estabelecida.
+
+Segundo Casciaro e Mammino (2016), streams podem ser encadeadas, semelhante às promises, a diferença é que no caso das promises uma operação da cadeia deve ser finalizada para que a próxima comece, já com streams cada pedaço que passa por uma operação já é enviado e pode ser processado pela próxima operação. As Figuras 4 e 5 esclarecem essa diferença.
+
+
+#### Figura 4: Lendo um arquivo usando buffer
+
+![buffer](/img/4.png)
+
+##### Fonte: Casciaro e Mammino (2016)
+
+
+#### Figura 5: Lendo um arquivo usando stream
+
+![stream](/img/5.png)
+
+##### Fonte: Casciaro e Mammino (2016)
+
+
+Observa-se no primeiro passo da Figura 4 que uma parte do arquivo é lida e armazenada no buffer da memória, no segundo passo a leitura do arquivo é finalizada e todo conteúdo contido no buffer da memória é enviado à próxima operação. Enquanto na Figura 5 nota-se que no primeiro passo, assim que parte do arquivo está na memória, já é enviada para próxima operação, e no segundo passo a outra parte do arquivo é lida e enviada para próxima operação.
+
+Segundo Casciaro e Mammino (2016), em alguns casos a operação seguinte pode ser mais lenta do que a leitura, o que causaria um acúmulo de dados na memória semelhante ao uso de buffer, porém streams possuem um mecanismo interno para evitar isso. Esse mecanismo cria um buffer bem pequeno, e enquanto esse buffer estiver cheio a leitura é pausada, assim que houver espaço no buffer a leitura é retomada, evitando um erro de buffer overflow.
+
+
+### 2.5 - Exemplo Prático
+
+
+Um exemplo prático para esclarecer as vantagens e desvantagens do uso de código síncrono, assíncrono e streams é analisado a seguir. Neste exemplo criou-se uma aplicação de linha de comando simples, que apenas lê um arquivo, o compacta, logo em seguida o descompacta e finalmente o grava. É um bom exemplo para visualizar as diferenças em performance e ordem de execução entre código síncrono, assíncrono e streams.
+
+
+#### Figura 6: Arquivo zipSync.js
+
+![zipSync](/img/6.png)
+
+##### Fonte: Autoria própria
+
+
+#### Figura 7: Arquivo zipAsync.js
+
+![zipAsync](/img/7.png)
+
+##### Fonte: Autoria própria
+
+
+#### Figura 8: Arquivo zipStream.js
+
+![zipStream](/img/8.png)
+
+##### Fonte: Autoria própria
+
+
+Nas Figuras 6, 7 e 8 tem-se respectivamente o código fonte da nossa aplicação de três formas diferentes: síncrona, assíncrona com buffer e por último também assíncrona, porém utilizando streams. Explica-se agora os códigos fonte, linha por linha.
+
+As linhas de 1 a 5 são iguais nas três figuras. Nas linhas 1 e 2 carregam-se duas bibliotecas do Node.js que possuem funções para lidar com o sistema de arquivos e compactar arquivos respectivamente. Na linha 3 define-se uma variável que recebe o caminho do arquivo a ser lido. Na linha 4 carrega-se uma biblioteca, mostrada no apêndice A, que apenas serve para cronometrar o tempo de execução da aplicação. E na linha 5 inicia-se a contagem do tempo. Também em comum nas três figuras é a última linha que imprime no terminal a string “Outras Tarefas”. Isso serve para visualizar quando seriam executadas possíveis outras tarefas na aplicação, antes ou depois das operações no arquivo serem finalizadas.
+
+Entre a quinta e a última linha dos códigos fontes, são executadas funções para ler, compactar, descompactar e gravar o arquivo, nesta ordem. Todas essas funções fazem parte das bibliotecas nativas do Node.js: fs e zlib. A diferença é que na Figura 6 as funções usadas são síncronas, na Figura 7 as funções são assíncronas com buffer, e na Figura 8 as funções são assíncronas com streams.
+
+Observa-se agora, na Figura 9, o resultado da execução das três implementações de nossa aplicação utilizando o mesmo arquivo (de 346MB) como entrada.
+
+
+#### Figura 9: Execução das três implementações da aplicação
+
+![execução das aplicações](/img/9.png)
+
+##### Fonte: Autoria própria
+
+
+Nas três primeiras linhas observa-se o resultado da aplicação com funções síncronas, o mais importante a ser notado aqui é o fato da string “Outras Tarefas” aparecer após a finalização do cronômetro, isso significa que outras tarefas seriam bloqueadas e só executariam após o término das operações feitas no arquivo. Observa-se também que a aplicação síncrona é a mais rápida de todas como é de se esperar já que as operações no arquivo não pausam.
+
+Da quarta linha até a sexta, tem-se a execução da aplicação assíncrona em buffer. Nota-se que ela é a mais lenta de todas, leva cerca de 20% a mais de tempo em relação a aplicação síncrona. Porém o destaque é o fato da string “Outras Tarefas” aparecer antes da finalização do cronômetro, ou seja, caso existam outras tarefas estas não precisam aguardar as operações no arquivo finalizarem para executar, o que é de acordo com a filosofia de não bloquear o loop de eventos.
+
+Da sétima linha à nona linha, exibe-se o resultado da aplicação assíncrona utilizando streams. Assim como a aplicação assíncrona com buffer, as “Outras Tarefas” são executadas antes das operações no arquivo finalizarem. E também se observa que o tempo de execução é menor em relação a implementação com buffer, isso deve-se ao fato de que o encadeamento de streams permite que por exemplo a operação de compactar inicie assim que uma pequena parte da operação de leitura está pronta.
+
+Conclui-se então que é melhor optar por código síncrono quando o bloqueio não é um problema, por exemplo na inicialização de um servidor pois o código executa apenas uma vez e ainda não entrou no loop de eventos. Já para operações dentro do loop de eventos é melhor optar pela opção assíncrona com streams, quando possível, principalmente para lidar com arquivos grandes, pois além de ser mais rápida, é mais leve em relação a memória como já foi visto anteriormente.
+
+
+
+
+## 3 - Bibliotecas
+
+
+Mueller (2016) define uma biblioteca como qualquer código externo que é adicionada a sua aplicação. O autor ainda afirma que bibliotecas são puramente códigos que são baixados e executados como parte de uma aplicação. É possível usar funções diretamente, algumas vezes o código fonte está disponível para se mudar o comportamento dessas funções.
+
+Casciaro e Mammino (2016) definem um módulo como um meio fundamental para estruturar o código de um programa. É um bloco de construção para criar aplicações e bibliotecas reusáveis chamadas de pacotes. Os autores ainda destacam que um dos princípios do Node.js é criar módulos pequenos, pois são mais fáceis de entender e reusar, simples de testar e perfeitos para compartilhar com o navegador. O termo pacote é usado para se referir a um módulo ou biblioteca de código.
+
+Casciaro e Mammino (2016) definem um módulo como um meio fundamental para estruturar o código de um programa. É um bloco de construção para criar aplicações e bibliotecas reusáveis chamadas de pacotes. Os autores ainda destacam que um dos princípios do Node.js é criar módulos pequenos, pois são mais fáceis de entender e reusar, simples de testar e perfeitos para compartilhar com o navegador. O termo pacote é usado para se referir a um módulo ou biblioteca de código.
+
+Dahl (2018) diz que um de seus maiores arrependimentos quanto a criação do Node.js é a falta de atenção à segurança. Um exemplo que ele cita é o fato de bibliotecas terem acesso ao computador e a rede de seu servidor ou computador que está executando a aplicação. Esse é um dos motivos pelo qual recomenda-se executar aplicações em um sandbox, e nunca como root ou administrador.
+
+Düüna (2016) alerta que para usar bibliotecas de terceiros é preciso ter confiança. Isso significa ter certeza que as bibliotecas foram escritas por pessoas bem-intencionadas, não pessoas que querem causar danos e prejuízos. Além disso é preciso confiar que as bibliotecas e suas dependências não possuem erros ou vulnerabilidades conhecidas. O autor mostra que um projeto pode conter dezenas e até centenas de bibliotecas e dependências, o que faz a checagem manual das mesmas impossível. Afinal a ideia é usar bibliotecas para ganhar tempo, e não gastar tempo procurando vulnerabilidades.
+
+Segundo Düüna (2016) existem três opções para lidar com uma escolha de pacotes: escolher pacotes populares; obscurecer pacotes; e escrever seu próprio código. A primeira opção baseia-se no fato de que quanto mais pessoas usam um pacote maior a comunidade por trás do mesmo. O que implica em um maior número de pessoas procurando vulnerabilidades e atualizando o pacote para remover as mesmas. Assim as vulnerabilidades mais óbvias muito provavelmente já foram encontradas e removidas. Além disso é comum pacotes populares terem uma ou mais empresas grandes por trás, seja desenvolvendo ou patrocinando, e geralmente elas também cedem recursos para melhorar a segurança do pacote. Porém o autor alerta que um maior número de usuários também significa uma atração maior para hackers mal-intencionados.
+
+A segunda opção discutida por Düüna (2016) é obscurecer pacotes. Isso significa expor o mínimo possível de sua aplicação, como por exemplo quais pacotes ela usa. A última opção descrita pelo autor é escrever o próprio código. Essa geralmente é a opção mais demorada e cara. Além disso o autor lembra que todos estão suscetíveis ao erro, e em uma biblioteca de terceiros é possível que o próprio desenvolvedor ou alguém que usou a biblioteca tenha encontrado e removido vulnerabilidades.
+
+Um exemplo de pacote muito popular é o Express (https://expressjs.com), que fornece uma série de recursos para criação de aplicações web. É um projeto de código aberto criado em junho de 2009, e conta com mais de duzentos contribuidores diretos. Como é um dos pacotes mais antigos e mais populares, a chance de uma vulnerabilidade ter passado despercebida é muito pequena.
+
+Düüna (2016) diz que após a escolha dos pacotes é preciso verificar, auditar e testar os mesmos em relação a segurança. Primeiramente o autor aconselha a observar as funcionalidades do pacote que são usadas na aplicação. Se a maioria delas não for utilizada, talvez o pacote escolhido não seja o ideal. Pacotes inchados podem complicar o código da aplicação e criar dependências desnecessárias.
+
+O autor também recomenda que se verifique o caminho percorrido pelos dados dentro do pacote. Verificar se não são manipulados de forma insegura ou maliciosa. Se os dados se originam de entradas do usuário é preciso verificar se eles estão de acordo com os padrões: não usam a função eval ou semelhantes (vulneráveis a injeção de códigos); as funções não devem ser invocadas antes da validação dos dados; devem existir limites para os valores.
+
+Düüna (2016) destaca que é comum códigos maliciosos serem inseridos em scripts dentro do arquivo package.json ou de funções temporais, principalmente setInterval. Pois assim esses códigos maliciosos são executados pelos scripts ou de tempo em tempo. O autor também recomenda verificar se os pacotes usam os módulos nativos de Node.js (http, fs, net, tls, child_process, cluster, udp, vm, entre outros), pois esses módulos são usados para acessar funções do sistema operacional, sistema de arquivos, rede e outros. Por isso também é importante não executar pacotes de terceiros em contas root ou administrador.
+
+Outra boa prática relatada por Düüna (2016) é manter os pacotes atualizados, pois assim vulnerabilidades recém encontradas podem ser removidas. O autor destaca ainda que é preciso testar as atualizações antes de usá-las em produção, pois elas podem criar bugs inesperados na aplicação. Dois sites que mantém bases de vulnerabilidades de pacotes são: npmjs.com/advisories e snyk.io/vuln. Um site muto bom para procurar pacotes é o npms.io que avalia os pacotes em relação à popularidade, manutenção e qualidade. 
+
+É claro que entrar nos sites acima citados e checar um por um dos pacotes usados em sua aplicação, e todas dependências deles, consumiria muito tempo. Por isso existem ferramentas para realizar essa checagem de forma rápida. O NPM conta com uma ferramenta padrão que verifica os pacotes vulneráveis, basta digitar o comando npm audit em um terminal aberto na pasta que contém seu projeto. As Figuras 10 e 11 mostram respectivamente o resultado desse comando em uma aplicação que possui um pacote com vulnerabilidades conhecidas, e em uma aplicação livre de pacotes com vulnerabilidades conhecidas.
+
+
+#### Figura 10: Comando npm audit em uma aplicação com vulnerabilidades conhecidas
+
+![npm audit com vulnerabilidade](/img/10.png)
+
+##### Fonte: Autoria própria
+
+
+#### Figura 11: Comando npm audit em uma aplicação sem vulnerabilidades conhecidas
+
+![npm audit sem vulnerabilidade](/img/11.png)
+
+##### Fonte: Autoria própria
+
+
+Na Figura 10 uma vulnerabilidade foi encontrada, o comando npm audit informa o nível da vulnerabilidade como moderado. Também mostra qual o tipo da vulnerabilidade, nesse caso Denial of Service, negação de serviço. Além disso informa qual pacote possui a vulnerabilidade, de qual outro pacote ele é dependência, o caminho para o pacote vulnerável, e fornece um endereço para maiores informações. Também se mostra a vulnerabilidade já foi removida em alguma versão do pacote, nesse caso ainda não há um patch disponível.
+
+A Snyk, empresa focada em encontrar e solucionar vulnerabilidades em pacotes, também possui uma ferramenta para encontrar pacotes vulneráveis em sua aplicação. Primeiro é preciso instalar a ferramenta usando npm install -g snyk. É necessário estar autenticado no site da Snyk para utilizar essa ferramenta. Depois utiliza-se o comando snyk test para procurar vulnerabilidades. E também é possível usar o comando snyk monitor, que monitora as dependências de sua aplicação e te notifica por e-mail caso novas vulnerabilidades sejam encontradas em algum pacote usado por sua aplicação. As Figuras 12 e 13 mostram, respectivamente, exemplos desses comandos em uma aplicação com vulnerabilidades conhecidas, e uma aplicação sem vulnerabilidades conhecidas.
+
+
+#### Figura 12: Comando snyk test em uma aplicação com vulnerabilidades conhecidas
+
+![snyk test com vulnerabilidade](/img/12.png)
+
+##### Fonte: Autoria própria
+
+
+#### Figura 13: Comando snyk test e snyk monitor em uma aplicação sem vulnerabilidades conhecidas
+
+![snyk test sem vulnerabilidade](/img/13.png)
+
+##### Fonte: Autoria própria
+
+
+A ferramenta snyk mostra algumas informações diferentes em relação ao comando npm audit. O principal diferencial é a capacidade de monitorar as vulnerabilidades com o comando snyk monitor e receber atualizações por e-mail.
+
+Como já foi citado, Düüna (2016) recomenda o uso de pacotes de terceiros pois a chance de vulnerabilidades passarem despercebidas por eles é menor do que se o desenvolvedor escrever o próprio código. Isso é mais relevante ainda quando se fala de pacotes que resolvem problemas mais complicados relacionados a segurança, como por exemplo criptografar senhas. Por isso é importante conhecer alguns pacotes úteis relacionados a segurança. Serão explorados a seguir neste capítulo alguns desses pacotes, principalmente relacionados a negação de serviço.
+
+
+### 3.1 - Express-rate-limit
+
+
+Segundo sua documentação (https://github.com/nfriedly/express-rate-limit), o Express-Rate-Limit é uma biblioteca para aplicações Node.js/Express usada para limitar requisições repetidas a uma aplicação. Isso é muito útil contra ataques de negação de serviço distribuídos (DDoS), pois limita a quantidade de recursos que cada máquina atacante consome.
+
+É claro que é possível limitar requisições através de outros recursos, um firewall por exemplo. Porém existem algumas vantagens em limitar requisições no próprio código de sua aplicação. Uma delas discute-se no próximo parágrafo: capacidade de configurar um limite diferente para cada rota da aplicação. Outra vantagem é que muitas vezes a aplicação é hospedada em um serviço terceirizado, e não há garantia de que esse serviço configure seu firewall de maneira adequada. E ainda que a aplicação seja hospedada na própria organização, pode acontecer de alguma configuração do firewall falhar ou ser corrompida. Portanto é melhor ter limitação redundante do que contar apenas com um recurso.
+
+A documentação do Express-Rate-Limit mostra também que é possível configurar a quantidade máxima de requisições em um determinado tempo, também configurável. Ele também permite configurar um limite para aplicação toda, ou separadamente para cada rota da aplicação. Assim é possível limitar as requisições de acordo com o recurso. Por exemplo para uma página de login talvez seja interessante limitar 5 requisições a cada 15 minutos, para evitar ataques de força bruta contra as senhas dos usuários. Já para uma página de pesquisa por exemplo, pode ser viável configurar 20 requisições a cada 5 minutos. Esse recurso fornece uma flexibilidade para o desenvolvedor que não é possível com um firewall por exemplo.
+
+Na Figura 14 observa-se um exemplo de uso da biblioteca express-rate-limit aplicando regras diferentes para rotas diferentes. Para a rota /api tem-se um limite de 100 requisições a cada 15 minutos. Já para rota /create-account tem-se um limite de cinco requisições por hora. Como é possível perceber, existem algumas opções passadas à função rateLimit. A seguir destacam-se algumas opções e suas descrições segundo a documentação oficial da própria biblioteca:
+
+windowMs: quanto tempo em milisegundos deve-se manter o registro das requisições.
+
+max: número máximo de requisições antes de enviar uma resposta de erro 429.
+
+message: mensagem de erro enviada ao usuário após max ser atingido. O padrão é “Too many requests, please try again later”.
+
+statusCode: código de estado HTTP retornado após max ser excedido, por padrão é o código 429.
+
+
+#### Figura 14: Exemplo de uso da biblioteca express-rate-limit
+
+![express-rate-limit](/img/14.png)
+
+##### Fonte: Disponível em: <https://github.com/nfriedly/express-rate-limit>. Acesso em: 03 mar. 2019
+
+
+Existem outras opções não destacadas neste trabalho. É possível encontrá-las na documentação da própria biblioteca. Como foi mostrado o express-rate-limit é um pacote muito útil para segurança em relação a ataques de negação de serviço. O seu uso é recomendado, porém para alguns tipos de aplicação podem existir pacotes mais apropriados. Na própria documentação do pacote são discutidos estes casos, por isso recomenda-se checar qual o melhor pacote para sua aplicação.
+
+
+### 3.2 - PM2
+
+
+Segundo sua própria documentação, PM2 Runtime é um gerenciador de processos em produção para aplicações Node.js, com um balanceador de carga embutido. Permite que as aplicações executem o tempo todo, reiniciá-las sem tempo de inatividade, e facilita algumas operações de desenvolvimento comuns.
+
+O PM2 Runtime é gratuito e de código aberto. Existem outras duas versões do PM2 pagas: PM2 Plus e PM2 Enterprise. Essas versões pagas contam com mais funcionalidades e com suporte online.
+
+Para instalar o PM2 Runtime basta usar o comando npm install -g pm2. Para iniciar uma aplicação em modo de produção basta usar o comando: pm2 start app.js. Sendo app.js o ponto de entrada de sua aplicação. Com esse comando o PM2 já mantém sua aplicação executando o tempo todo, reiniciando automaticamente em caso de crash, sem tempo de inatividade. E para que a aplicação reinicie automaticamente no caso da máquina em que a aplicação reside reiniciar, basta usar o comando: pm2 startup. Para gerenciar os processos da aplicação o PM2 cria uma lista de processos, que pode ser acessada com o comando pm2 ls, como mostra a Figura 15.
+
+
+#### Figura 15: Lista de processos iniciados com o comando pm2 start
+
+![pm2](/img/15.png)
+
+##### Fonte: Disponível em: <https://pm2.io/doc/en/runtime/overview/>. Acesso em: 03 mar. 2019
+
+
+Para adicionar processos a essa lista, basta usar o comando pm2 start, como já foi escrito anteriormente. Para remover processos usa-se o comando pm2 delete <nome do app>. Existem ainda outros comandos para gerenciar os processos, como por exemplo: pm2 stop; pm2 reload; pm2 restart.
+
+Também é possível gerar arquivos de log facilmente com o PM2. Basta usar o comando pm2 logs <nome do app> para gerar logs de um processo, ou usa-se o comando pm2 logs all, para gerar logs de todos processos. Os arquivos de log são salvos na pasta ~/.pm2/logs. Existem várias opções para gerenciar logs, por exemplo: criar vários arquivos e não apenas um muito grande; apagar os arquivos de log; escolher o formato do arquivo.
+
+Uma funcionalidade muito útil do PM2, principalmente para reduzir chances de negação de serviço, é o modo cluster. Nesse modo o PM2 cria vários processos filhos da sua aplicação e balanceia a carga entre eles. Isso aumenta a performance e reduz tempo de inatividade. Para usar essa função basta iniciar a aplicação com o comando: pm2 start app.js -i max. Sendo app.js o ponto de entrada da aplicação, e -i é a opção que controla o número de instâncias. Neste caso max significa que o PM2 detecta automaticamente o número de CPUs (Central Processing Unit) disponíveis e executa quantos processos forem possíveis. Também é possível usar um número específico no lugar de max. Nesse caso o número de instâncias será o menor entre: o número digitado na opção; e o número de CPUs disponíveis.
+
+Outra função interessante do PM2 é o monitoramento direto no terminal. Basta digitar o comando pm2 monit em um terminal. Essa tela mostra consumo de CPU e memória, logs de requisições, número de requisições por minuto, delay do loop de eventos, quantas vezes o servidor foi reiniciado, o tempo de atividade, entre outros. Além disso o PM2 tem várias outras funcionalidades para gerenciar sua aplicação e reduzir o tempo de indisponibilidade da mesma.
+
+
+### 3.3 - Helmet
+
+
+Helmet é um pacote que ajuda a deixar aplicações Node.js feitas com o framework Express mais seguras, configurando vários cabeçalhos HTTP. Ele não é voltado especificamente para proteção contra negação de serviço, e sim para vários tipos de vulnerabilidades que podem ser exploradas caso alguns cabeçalhos HTTP estejam mal configurados. O uso do Helmet é recomendado por vários profissionais, o próprio site oficial do Express recomenda. Düüna (2016) mostra como usando o Helmet e com apenas algumas linhas de código é possível se proteger de uma variedade de ataques, como mostra a Figura 16.
+
+
+#### Figura 16: Exemplo de uso do pacote Helmet
+
+![helmet](/img/16.png)
+
+##### Fonte: Düüna
+
+
+Observa-se que Düüna (2016) usa a configuração padrão do Helmet, e além disso configura o cabeçalho Content Security Policy (CPS). O CPS define de quais origens podem ser os scripts executados na aplicação. A opção self determina que apenas scripts do próprio domínio da aplicação podem executar. Isso previne ataques de Cross-Site Scripting (XSS).
+
+Um dos cabeçalhos mais importantes configurado pelo Helmet é o cabeçalho X-Powered-By. Esse cabeçalho indica qual tecnologia a aplicação usa. É uma boa prática de segurança remover esse cabeçalho. Pois hackers podem usá-lo para encontrar aplicações que usam uma determinada tecnologia a qual eles encontraram uma vulnerabilidade. Removendo esse cabeçalho sua aplicação fica protegida contra esses ataques em massa.
+
+A Figura 17 mostra qual a configuração padrão do Helmet, usada por Düüna (2016) em seu exemplo.
+
+
+#### Figura 17: Configuração padrão do Helmet
+
+![helmet config](/img/17.png)
+
+##### Fonte: Disponível em: <https://helmetjs.github.io/>. Acesso em: 03 mar. 2019
+
+
+Ainda no tópico de cabeçalhos HTTP, mas não relacionado ao Helmet, em 27 de novembro de 2018 foi lançado uma atualização para o Node.js que resolveu duas vulnerabilidades de negação de serviço relacionadas a cabeçalhos HTTP. A primeira consiste no fato de que antes dessa atualização os cabeçalhos podiam ter até 80 kilobytes, e após a atualização só podem ter até 8 kilobytes. Isso era um problema pois usando uma combinação de requisições com cabeçalhos de tamanho máximo era possível fazer o servidor HTTP ser interrompido. A segunda vulnerabilidade era o fato de ser possível enviar cabeçalhos HTTP de maneira bem lenta, mantendo as conexões e os recursos alocados por um tempo muito longo, causando indisponibilidade para outros usuários legítimos da aplicação. Mais detalhes sobre essa atualização, e vulnerabilidades, podem ser encontrados no site oficial do Node.js.
+
+
+### 3.4 - Validação
+
+
+Nesta seção discute-se a importância de validar dados fornecidos por usuários a fim de evitar ataques de injeção de código. Mostra-se também algumas bibliotecas com foco em validação de dados.
+
+Düüna (2016) define injeção de código como um ataque no qual um código malicioso é inserido na aplicação e faz o programa executá-lo. Esse tipo de ataque faz o servidor realizar algo que não é seu propósito. Isso inclui obter informações confidenciais, modificar ou danificar o servidor, entre outros. O autor ainda afirma que por existirem diversos tipos de injeção de código, este é o tipo de ataque mais usado contra aplicações web. Segundo o autor para combater esse tipo de ataque é preciso validar os dados fornecidos pelo usuário e sanear esses dados. Isso significa remover caracteres especiais, que são usados para escrever códigos.
+
+Geralmente ataques de injeção de código são usados para obter ou excluir informações. Porém De Turckheim (2018) mostra que é possível realizar um ataque de negação de serviço utilizando injeção de código. Esse ataque consiste em utilizar uma falha no MongoDB, um banco de dados muito popular em aplicações Node.js. Essa falha é uma função específica do MongoDB que faz o servidor pausar por um determinado tempo. Ele mostra que injetando essa função em uma busca no banco de dados pode causar indisponibilidade na aplicação.
+
+Uma biblioteca para validação de dados é a Validator.js. Ela conta com mais de cinquenta funções de validação e mais de dez funções de saneamento de strings. Outras duas bibliotecas de validação são Joi (https://github.com/hapijs/joi) e Celebrate (https://github.com/arb/celebrate#readme). Joi usa esquemas no formato de objetos JavaScript para validar dados. É muito útil para validar cabeçalhos de requisições HTTP. Celebrate apenas facilita o uso da biblioteca Joi em aplicações construídas sobre o framework Express.
+
+Conclui-se que é muito importante validar e sanear dados. Pois ataques de injeção de código podem causar diversos tipos de dano, inclusive negação de serviço. Também se mostrou que existem diversas bibliotecas especialmente desenvolvidas para validação e saneamento de dados. O uso delas pode significar a proteção de sua aplicação contra a maior parte dos ataques realizados na web.
+
