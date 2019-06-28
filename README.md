@@ -47,51 +47,29 @@ Este trabalho apresenta algumas das principais vulnerabilidades de negação de 
 ## Lista de Figuras
 
 
-[Figura 1 - Diagrama de um servidor multi-threaded bloqueante](#Figura-1-Diagrama-de-um-servidor-multi-threaded-bloqueante)
-
-Figura 2 - Diagrama de um servidor single-threaded não bloqueante
-
-Figura 3 - Diagrama do loop de eventos
-
-Figura 4 - Lendo um arquivo usando buffer
-
-Figura 5 - Lendo um arquivo usando stream
-
-Figura 6 - Arquivo zipSync.js
-
-Figura 7 - Arquivo zipAsync.js
-
-Figura 8 - Arquivo zipStream.js
-
-Figura 9 - Execução das três implementações da aplicação
-
-Figura 10 - Comando npm audit em uma aplicação com vulnerabilidades conhecidas
-
-Figura 11 - Comando npm audit em uma aplicação sem vulnerabilidades conhecidas
-
-Figura 12 - Comando snyk test em uma aplicação com vulnerabilidades conhecidas
-
-Figura 13 - Comandos snyk test e snyk monitor em aplicação sem vulnerabilidades conhecidas
-
-Figura 14 - Exemplo de uso da biblioteca express-rate-limit
-
-Figura 15 - Lista de processos iniciados com o comando pm2 start
-
-Figura 16 - Exemplo de uso do pacote Helmet
-
-Figura 17 - Configuração padrão do Helmet
-
-Figura 18 - Exemplo de uso de expressão regular (arquivo regex.js)
-
-Figura 19 - Resultado da execução do arquivo regex.js
-
-Figura 20 - Exemplo de aplicação com expressão regular vulnerável
-
-Figura 21 - Usando a aplicação com uma entrada válida
-
-Figura 22 - Usando a aplicação com uma entrada maliciosa
-
-Figura 23 – Arquivo crono.js
+- [Figura 1 - Diagrama de um servidor multi-threaded bloqueante](#Figura-1-Diagrama-de-um-servidor-multi-threaded-bloqueante)
+- [Figura 2 - Diagrama de um servidor single-threaded não bloqueante](#Figura-2-Diagrama-de-um-servidor-single-threaded-não-bloqueante)
+- [Figura 3 - Diagrama do loop de eventos](#Figura-3-Diagrama-do-loop-de-eventos)
+- [Figura 4 - Lendo um arquivo usando buffer](#Figura-4-Lendo-um-arquivo-usando-buffer)
+- [Figura 5 - Lendo um arquivo usando stream](#Figura-5-Lendo-um-arquivo-usando-stream)
+- [Figura 6 - Arquivo zipSync.js](#Figura-6-Arquivo-zipSync.js)
+- [Figura 7 - Arquivo zipAsync.js](#Figura-7-Arquivo-zipAsync.js)
+- [Figura 8 - Arquivo zipStream.js](#Figura-8-Arquivo-zipStream.js)
+- [Figura 9 - Execução das três implementações da aplicação](#Figura-9-Execução-das-três-implementações-da-aplicação)
+- [Figura 10 - Comando npm audit em uma aplicação com vulnerabilidades conhecidas](#Figura-10-Comando-npm-audit-em-uma-aplicação-com-vulnerabilidades-conhecidas)
+- [Figura 11 - Comando npm audit em uma aplicação sem vulnerabilidades conhecidas](#Figura-11-Comando-npm-audit-em-uma-aplicação-sem-vulnerabilidades-conhecidas)
+- [Figura 12 - Comando snyk test em uma aplicação com vulnerabilidades conhecidas](#Figura-12-Comando-snyk-test-em-uma-aplicação-com-vulnerabilidades-conhecidas)
+- [Figura 13 - Comandos snyk test e snyk monitor em aplicação sem vulnerabilidades conhecidas](#Figura-13-Comandos-snyk-test-e-snyk-monitor-em-aplicação-sem-vulnerabilidades-conhecidas)
+- [Figura 14 - Exemplo de uso da biblioteca express-rate-limit](#Figura-14-Exemplo-de-uso-da-biblioteca-express-rate-limit)
+- [Figura 15 - Lista de processos iniciados com o comando pm2 start](#Figura-15-Lista-de-processos-iniciados-com-o-comando-pm2-start)
+- [Figura 16 - Exemplo de uso do pacote Helmet](#Figura-16-Exemplo-de-uso-do-pacote-Helmet)
+- [Figura 17 - Configuração padrão do Helmet](#Figura-17-Configuração-padrão-do-Helmet)
+- [Figura 18 - Exemplo de uso de expressão regular (arquivo regex.js)](#Figura-18-Exemplo-de-uso-de-expressão-regular-arquivo-regex.js)
+- [Figura 19 - Resultado da execução do arquivo regex.js](#Figura-19-Resultado-da-execução-do-arquivo-regex.js)
+- [Figura 20 - Exemplo de aplicação com expressão regular vulnerável](#Figura-20-Exemplo-de-aplicação-com-expressão-regular-vulnerável)
+- [Figura 21 - Usando a aplicação com uma entrada válida](#Figura-21-Usando-a-aplicação-com-uma-entrada-válida)
+- [Figura 22 - Usando a aplicação com uma entrada maliciosa](#Figura-22-Usando-a-aplicação-com-uma-entrada-maliciosa)
+- [Figura 23 – Arquivo crono.js](#Figura-23-Arquivo-crono.js)
 
 
 
@@ -99,45 +77,26 @@ Figura 23 – Arquivo crono.js
 ## Lista de Abreviaturas e Siglas
 
 
-APM - Application Performance Management
-
-CEP - Código de Endereçamento Postal
-
-CPS - Content Security Policy
-
-CPU - Central Processing Unit
-
-DNS - Domain Name System
-
-DDoS - Distributed Denial of Service
-
-DoS - Denial of Service
-
-ECMA - European Computer Manufacturers Association
-
-FIFO - First In First Out
-
-HTTP - Hyper Text Transfer Protocol
-
-HTTPS - Hyper Text Transfer Protocol Secure
-
-I/O - Input/Output
-
-JS - JavaScript
-
-JSON - JavaScript Object Notation
-
-ms - milissegundos
-
-REDOS - Regular Expression Denial of Service
-
-regex - Regular Expressions
-
-SQL - Structured Query Language
-
-URL - Uniform Resource Locator
-
-XSS - Cross-Site Scripting
+- APM - Application Performance Management
+- CEP - Código de Endereçamento Postal
+- CPS - Content Security Policy
+- CPU - Central Processing Unit
+- DNS - Domain Name System
+- DDoS - Distributed Denial of Service
+- DoS - Denial of Service
+- ECMA - European Computer Manufacturers Association
+- FIFO - First In First Out
+- HTTP - Hyper Text Transfer Protocol
+- HTTPS - Hyper Text Transfer Protocol Secure
+- I/O - Input/Output
+- JS - JavaScript
+- JSON - JavaScript Object Notation
+- ms - milissegundos
+- REDOS - Regular Expression Denial of Service
+- regex - Regular Expressions
+- SQL - Structured Query Language
+- URL - Uniform Resource Locator
+- XSS - Cross-Site Scripting
 
 
 
@@ -145,49 +104,28 @@ XSS - Cross-Site Scripting
 ## Sumário
 
 
-[Introdução]()
-
-[1 - Conceitos Básicos]()
-
-[1.1 - Segurança da Informação]()
-
-[1.2 - Aplicações Web]()
-
-[1.3 - Node.js]()
-
-[1.4 - Negação de Serviço]()
-
-[2 - O Loop de Eventos]()
-
-[2.1 - Bloqueante X Não Bloqueante]()
-
-[2.2 - O que é o Loop de Eventos]()
-
-[2.3 - Síncrno X Assíncrono]()
-
-[2.4 - Streams]()
-
-[2.5 - Exemplo Prático]()
-
-[3 - Bibliotecas]()
-
-[3.1 - Express-rate-limit]()
-
-[3.2 - PM2]()
-
-[3.3 - Helmet]()
-
-[3.4 - Validação]()
-
-[4 - Expressões Regulares]()
-
-[5 - Boas Práticas]()
-
-[Considerações Finais]()
-
-[Referências Bibliográficas]()
-
-[Apêndice A]()
+[Introdução](#Introdução)
+[1 - Conceitos Básicos](#)
+[1.1 - Segurança da Informação](#)
+[1.2 - Aplicações Web](#)
+[1.3 - Node.js](#)
+[1.4 - Negação de Serviço](#)
+[2 - O Loop de Eventos](#)
+[2.1 - Bloqueante X Não Bloqueante](#)
+[2.2 - O que é o Loop de Eventos](#)
+[2.3 - Síncrno X Assíncrono](#)
+[2.4 - Streams](#)
+[2.5 - Exemplo Prático](#)
+[3 - Bibliotecas](#)
+[3.1 - Express-rate-limit](#)
+[3.2 - PM2](#)
+[3.3 - Helmet](#)
+[3.4 - Validação](#)
+[4 - Expressões Regulares](#)
+[5 - Boas Práticas](#)
+[Considerações Finais](#)
+[Referências Bibliográficas](#)
+[Apêndice A](#)
 
 
 
@@ -534,7 +472,7 @@ A Snyk, empresa focada em encontrar e solucionar vulnerabilidades em pacotes, ta
 *Fonte: Autoria própria*
 
 
-##### Figura 13: Comando snyk test e snyk monitor em uma aplicação sem vulnerabilidades conhecidas
+##### Figura 13: Comandos snyk test e snyk monitor em aplicação sem vulnerabilidades conhecidas
 
 ![snyk test sem vulnerabilidade](/img/13.png)
 
@@ -881,7 +819,7 @@ WHITMAN, Michael E.; MATTORD, Hebert J. Principles of Information Security. 4. e
 Biblioteca crono.js, utilizada para cronometrar o tempo de execução nos exemplos da seção 2.5.
 
 
-##### Figura 23: crono.js
+##### Figura 23: Arquivo crono.js
 
 ![crono.js](/img/23.png)
 
