@@ -104,28 +104,28 @@ Este trabalho apresenta algumas das principais vulnerabilidades de negação de 
 ## Sumário
 
 
-[Introdução](#Introdução)
-[1 - Conceitos Básicos](#)
-[1.1 - Segurança da Informação](#)
-[1.2 - Aplicações Web](#)
-[1.3 - Node.js](#)
-[1.4 - Negação de Serviço](#)
-[2 - O Loop de Eventos](#)
-[2.1 - Bloqueante X Não Bloqueante](#)
-[2.2 - O que é o Loop de Eventos](#)
-[2.3 - Síncrno X Assíncrono](#)
-[2.4 - Streams](#)
-[2.5 - Exemplo Prático](#)
-[3 - Bibliotecas](#)
-[3.1 - Express-rate-limit](#)
-[3.2 - PM2](#)
-[3.3 - Helmet](#)
-[3.4 - Validação](#)
-[4 - Expressões Regulares](#)
-[5 - Boas Práticas](#)
-[Considerações Finais](#)
-[Referências Bibliográficas](#)
-[Apêndice A](#)
+- [Introdução](#Introdução)
+- [1 - Conceitos Básicos](#1---Conceitos-Básicos)
+- [1.1 - Segurança da Informação](#1.1---Segurança-da-Informação)
+- [1.2 - Aplicações Web](#1.2---Aplicações-Web)
+- [1.3 - Node.js](#1.3---Node.js)
+- [1.4 - Negação de Serviço](#1.4---Negação-de-Serviço)
+- [2 - O Loop de Eventos](#2---O-Loop-de-Eventos)
+- [2.1 - Bloqueante X Não Bloqueante](#2.1---Bloqueante-X-Não-Bloqueante)
+- [2.2 - O que é o Loop de Eventos](#2.2---O-que-é-o-Loop-de-Eventos)
+- [2.3 - Síncrno X Assíncrono](#2.3---Síncrono-X-Assíncrono)
+- [2.4 - Streams](#2.4---Streams)
+- [2.5 - Exemplo Prático](#2.5---Exemplo-Prático)
+- [3 - Bibliotecas](#3---Bibliotecas)
+- [3.1 - Express-rate-limit](#3.1---Express-rate-limit)
+- [3.2 - PM2](#3.2---PM2)
+- [3.3 - Helmet](#3.3---Helmet)
+- [3.4 - Validação](#3.4---Validação)
+- [4 - Expressões Regulares](#4---Expressões-Regulares)
+- [5 - Boas Práticas](#5---Boas-Práticas)
+- [Considerações Finais](#Considerações-Finais)
+- [Referências Bibliográficas](#Referências-Bibliográficas)
+- [Apêndice A](#Apêndice-A)
 
 
 
@@ -164,6 +164,7 @@ Node.js é uma tecnologia relativamente nova que ganhou popularidade rapidamente
 O método utilizado foi a pesquisa bibliográfica, realizada em livros e sites relacionados a segurança de aplicações web, Node.js, e combate a vulnerabilidades.
 
 
+[Voltar ao Sumário](#Sumário)
 
 
 ## 1 - Conceitos Básicos
@@ -228,6 +229,7 @@ Mueller (2016) enfatiza que uma parte importante de um ataque DoS é requisitar 
 Nahari e Krutz categorizam as soluções para combater ataques DoS em dois tipos: preventivas e reativas. Soluções preventivas impedem o ataque tomando medidas de precaução, como por exemplo: filtros, estabelecimento de limites, esconder a localização de recursos e detecção de intrusos. Já as soluções reativas são acionadas durante o ataque e geralmente tem o objetivo de determinar a origem do ataque, alguns exemplos são: marcação de pacotes, testes de conexão e coleta de dados em registros (logs).
 
 
+[Voltar ao Sumário](#Sumário)
 
 
 ## 2 - O Loop de Eventos
@@ -414,6 +416,7 @@ Da sétima linha à nona linha, exibe-se o resultado da aplicação assíncrona 
 Conclui-se então que é melhor optar por código síncrono quando o bloqueio não é um problema, por exemplo na inicialização de um servidor pois o código executa apenas uma vez e ainda não entrou no loop de eventos. Já para operações dentro do loop de eventos é melhor optar pela opção assíncrona com streams, quando possível, principalmente para lidar com arquivos grandes, pois além de ser mais rápida, é mais leve em relação a memória como já foi visto anteriormente.
 
 
+[Voltar ao Sumário](#Sumário)
 
 
 ## 3 - Bibliotecas
@@ -584,6 +587,7 @@ Uma biblioteca para validação de dados é a Validator.js. Ela conta com mais d
 Conclui-se que é muito importante validar e sanear dados. Pois ataques de injeção de código podem causar diversos tipos de dano, inclusive negação de serviço. Também se mostrou que existem diversas bibliotecas especialmente desenvolvidas para validação e saneamento de dados. O uso delas pode significar a proteção de sua aplicação contra a maior parte dos ataques realizados na web.
 
 
+[Voltar ao Sumário](#Sumário)
 
 
 ## 4 - Expressões Regulares
@@ -678,9 +682,10 @@ Observa-se na tabela 1 que o tempo de resposta da aplicação aproximadamente do
 Goldberg et al (2019), recomendam usar, quando possível, uma biblioteca de validação, como por exemplo a validator.js já citada na seção 4.4. Quando for necessário usar uma expressão regular recomendam o uso da biblioteca safe-regex, que detecta expressões regulares potencialmente vulneráveis a ataques de negação de serviço. Os autores ainda recomendam validar o tamanho máximo da entrada antes de realizar qualquer operação com a mesma (incluindo testes com regex). Pois assim evita-se que, caso haja uma vulnerabilidade, o atacante não tenha o poder de usar uma entrada muito grande, minimizando os danos.
 
 
+[Voltar ao Sumário](#Sumário)
 
 
-## Boas Práticas
+## 5 - Boas Práticas
 
 
 Este capítulo destaca algumas boas práticas em Node.js relacionadas a segurança da informação, principalmente no aspecto de disponibilidade. O objetivo é mostrar ações que podem evitar uma variedade de vulnerabilidades em aplicações e aumentar consideravelmente a segurança da mesma. A principal base deste capítulo é o maior guia de boas práticas de Node.js atualmente, mantido por Goldberg et al (2019). O guia conta com 82 boas práticas, no momento de escrita deste trabalho, e é constantemente atualizado e expandido pelos responsáveis e por contribuições da comunidade. Algumas das boas práticas deste guia, principalmente relacionadas a negação de serviço, são listadas a seguir:
@@ -705,6 +710,7 @@ vulnerável.
 Düüna (2016) destaca algumas boas práticas para se evitar ataques de negação de serviço através de funções assimétricas. Funções assimétricas são aquelas cujo tempo de execução dependem do tamanho da entrada do usuário. A primeira recomendação do autor é evitar funções assimétricas quando possível. Mas algumas vezes não existe uma maneira de evitá-las, então o autor recomenda limitar o tamanho da entrada, como foi visto no parágrafo anterior. Düüna (2016) ainda recomenda que apenas usuários autenticados possam usar de funções assimétricas, diminuindo a possibilidade de ataques de negação de serviço.
 
 
+[Voltar ao Sumário](#Sumário)
 
 
 ## Considerações Finais
@@ -811,6 +817,7 @@ VALIDATOR.JS. Biblioteca para aplicações Node.js que valida dados, 2019. Dispo
 WHITMAN, Michael E.; MATTORD, Hebert J. Principles of Information Security. 4. ed. Boston: Course Technology, 2011.
 
 
+[Voltar ao Sumário](#Sumário)
 
 
 ## Apêndice A
@@ -824,3 +831,8 @@ Biblioteca crono.js, utilizada para cronometrar o tempo de execução nos exempl
 ![crono.js](/img/23.png)
 
 *Fonte: Autoria Própria*
+
+
+
+
+[Voltar ao Sumário](#Sumário)
