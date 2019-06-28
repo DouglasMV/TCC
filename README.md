@@ -47,7 +47,7 @@ Este trabalho apresenta algumas das principais vulnerabilidades de negação de 
 ## Lista de Figuras
 
 
-Figura 1 - Diagrama de um servidor multi-threaded bloqueante
+[Figura 1 - Diagrama de um servidor multi-threaded bloqueante](#Figura-1-Diagrama-de-um-servidor-multi-threaded-bloqueante)
 
 Figura 2 - Diagrama de um servidor single-threaded não bloqueante
 
