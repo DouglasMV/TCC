@@ -645,3 +645,244 @@ Uma biblioteca para validação de dados é a Validator.js. Ela conta com mais d
 
 Conclui-se que é muito importante validar e sanear dados. Pois ataques de injeção de código podem causar diversos tipos de dano, inclusive negação de serviço. Também se mostrou que existem diversas bibliotecas especialmente desenvolvidas para validação e saneamento de dados. O uso delas pode significar a proteção de sua aplicação contra a maior parte dos ataques realizados na web.
 
+
+
+
+## 4 - Expressões Regulares
+
+
+Na seção 3.4 mostrou-se a importância da validação de dados fornecidos pelo usuário. E uma das melhores ferramentas para se validar dados são as expressões regulares, também referidas como regex (regular expressions). Porém é preciso saber escrever expressões regulares seguras. Neste capítulo estuda-se o que são expressões regulares, como elas podem causar vulnerabilidades de negação de serviço, e como escrevê-las de maneira a evitar tais vulnerabilidades.
+
+A documentação oficial do Node.js define expressões regulares como expressões que têm a função de comparar uma string de entrada com um padrão. Por exemplo comparar se o valor digitado é do formato de um e-mail. É claro que isso é possível usando métodos de JavaScript específicos para strings. A vantagem de expressões regulares é o fato de ser possível criar padrões muito complexos em apenas uma linha de código. Não é do escopo deste trabalho ensinar todas regras e sintaxes de expressões regulares, pois são muitas. Kantor et al (2019) tem um capítulo, em seu tutorial moderno de JavaScript, dedicado apenas a expressões regulares. Neste trabalho apenas explica-se de forma sucinta como as expressões regulares funcionam em JavaScript. E foca-se em como evitar vulnerabilidades que podem causar negação de serviço.
+
+
+##### Figura 18: Exemplo de uso de expressão regular (arquivo regex.js)
+
+![regex.js](/img/18.png)
+
+*Fonte: Autoria própria*
+
+
+##### Figura 19: Resultado da execução do arquivo regex.js
+
+![execução de regex.js](/img/19.png)
+
+*Fonte: Autoria própria*
+
+
+Na Figura 18 mostra-se um exemplo de código que usa uma expressão regular para validar o formato de um CEP (Código de Endereçamento Postal). E na Figura 19 tem-se o resultado ao executar o código do arquivo mostrado na Figura 18. 
+
+Na primeira linha da Figura 18 definiu-se a expressão regular e salvou-se a mesma em uma variável chamada minhaRegex. Na terceira linha salvou-se uma string que contém um valor no formato válido para CEP na variável cepValido. Nas linhas 3, 4 e 5 salvou-se outras três strings em outras três variáveis, dessa vez representam valores em um formato inválido para CEP. Nas linhas 8 a 11 usa-se uma função que imprime na tela true caso a string seja válida segundo a expressão regular, e false caso contrário. Na Figura 19 observam-se os resultados conforme esperado, true para a string válida e false para as três strings inválidas.
+
+Agora explica-se a expressão regular. Observa-se primeiramente que se utilizam barras (/) no começo e no final, essas barras são uma maneira de definir uma expressão regular em JavaScript. O primeiro caractere dentro da expressão regular é um circunflexo (^) o qual determina que a expressão regular deve-se encontrar no começo da string. O cifrão ($) no final é similar ao circunflexo, porém indica que a expressão deve-se encontrar no final da string. Neste o uso do circunflexo e do cifrão garantem que não há nada antes ou depois do CEP, sem o uso deles a terceira string inválida retornaria true, o que seria um erro. Depois tem-se \d que identifica dígitos de 0 a 9, e {5} ao lado do \d significa que devem ter cinco dígitos agrupados. O próximo caractere é um hífen (-) que simplesmente identifica o próprio hífen. E em seguida tem-se \d{3} que identifica três dígitos agrupados.
+
+Portanto a expressão regular da Figura 18 apenas vai validar strings que começam com exatamente cinco dígitos, seguidos de um hífen, seguido de exatamente três dígitos no final da string. O que representa perfeitamente um CEP. Esse exemplo deixa claro o poder das expressões regulares. Imagine escrever esta mesma validação verificando caractere por caractere, certamente seria um código bem maior e mais difícil de compreender.
+
+Segundo a documentação oficial do Node.js, uma expressão regular vulnerável é uma expressão regular que leva um tempo exponencial para finalizar, o que pode causar um ataque REDOS (Regular Expression Denial of Service). A documentação ainda indica quatro regras para evitar vulnerabilidades de negação de serviço nas expressões regulares.
+
+A primeira regra é evitar quantificadores aninhados. Por exemplo a expressão /(\d+)+$/ é um exemplo do que deve ser evitado. Nessa expressão os parênteses são chamados de grupo de captura. Dentro deste grupo tem-se \d+ que representa um ou mais dígitos numéricos. E fora do grupo tem-se o caractere de adição que significa um ou mais. E logo após tem-se o caractere cifrão que representa o final da string. O problema com esse tipo de expressão regular ocorre quando se usa essa expressão em uma string composta por vários dígitos numéricos seguidos mas termina em um caractere que não é numérico. Suponha que a string seja “1234a”, o que acontece é que a expressão encontra o grupo “1234” que é composto por um ou mais dígitos. Em seguida a expressão verifica se encontrou um ou mais grupos de dígitos, o que é verdadeiro. Então a expressão verifica se a string termina em um dígito numérico, o que é falso. Assim a expressão volta ao começo e dessa vez captura dois grupos “123” e “4” mas ainda não termina com um dígito. Então no próximo passo captura as expressões “12” e “34”, depois as expressões “12”, “3” e “4”, e assim por diante. Em resumo a expressão tenta todas combinações possíveis dos grupos de dígitos mas nenhuma vai satisfazer a regex pois a string sempre termina com o caractere “a”. Agora imagine se um usuário entra com uma string que contenha muitos dígitos numéricos e um caractere não numérico no final. O tempo que levaria para o computador testar todos grupos seria muito grande, causando uma negação de serviço pois esses testes consomem todo processador e bloqueariam a thread.
+
+Outra regra é evitar “ou” com expressões repetidas. Por exemplo /(a|a)*/. Similar a primeira regra, esse tipo de expressão pode causar um consumo excessivo de processador e bloquear a thread causando indisponibilidade.
+
+A terceira regra é evitar usar referências a grupos de captura. Por exemplo /(a.*)\1/. Quando se usa grupos de captura referências aos mesmos são automaticamente criadas, e podem ser usadas com \1, \2, etc. Essas referências são úteis para evitar reescrever um mesmo grupo duas vezes, porém elas exigem muito da performance do processador. Logo é melhor repetir a escrita de uma parte da expressão para não afetar a performance.
+
+A quarta e última regra é usar o método indexOf quando se precisa de uma consulta simples em uma string. É possível usar expressões regulares para encontrar palavras em uma string, porém o método indexOf faz o mesmo e garante que sempre levará o menor tempo possível.
+
+
+##### Figura 20: Exemplo de aplicação com expressão regular vulnerável
+
+![regex vulnerável](/img/20.png)
+
+*Fonte: Autoria própria*
+
+
+A Figura 20 mostra um exemplo de expressão regular vulnerável pois não obedece a primeira regra. De fato é o mesmo exemplo usado para explicar essa regra anteriormente. A expressão regular vulnerável é /(\d+)+$/. Esse código cria um servidor web que lê uma string passada pela URL (Uniform Resource Locator) e usa a expressão regular para verificar se a string termina em dígitos numéricos. É óbvio que não é a melhor maneira de se fazer isso, porém para demonstrar um ataque de negação de serviço explorando expressões regulares vulneráveis é um bom exemplo, pois o código é sucinto. Após requisitar uma URL utilizando um navegador, é impresso na tela o valor da string de entrada, se ela foi validada ou não pela regex, e o tempo que o servidor levou para avaliar a string usando a regex e dar a resposta.
+
+
+##### Figura 21: Usando a aplicação com uma entrada válida
+
+![regex válida](/img/21.png)
+
+*Fonte: Autoria própria*
+
+
+##### Figura 22: Usando a aplicação com uma entrada maliciosa
+
+![regex válida](/img/22.png)
+
+*Fonte: Autoria própria*
+
+
+As Figuras 21 e 22 mostram o resultado da utilização da aplicação mostrada na Figura 20. Na Figura 21 tem-se um valor de entrada válido de trinta caracteres, com um tempo de resposta de aproximadamente 2 milissegundos. Na Figura 22 temse uma entrada maliciosa que explora a regex vulnerável, obtendo um tempo de resposta de mais de 12 segundos. Isso é extremamente preocupante pois durante esses 12 segundos a aplicação web não pode enviar respostas para nenhum cliente, gerando uma negação de serviço.
+
+
+##### Tabela 1: Tempos de resposta de acordo com o tamanho da entrada
+
+| Número de Caracteres | Tempo de Resposta (segundos) |
+|:--------------------:|---------------------------:|
+|26|0,869425535|
+|27|1,616451710|
+|28|3,167267293|
+|29|6,296623415|
+|30|12,238677298|
+|31|24,993667302|
+|32|50,202110160|
+|33|100,528942781|
+|34|199,121742321|
+
+*Fonte: Autoria própria*
+
+
+A tabela 1 mostra o tempo de resposta da aplicação da Figura 20 para entradas de diferentes tamanhos (número de caracteres). Sendo que todos caracteres são dígitos numéricos, exceto o último, criando uma entrada maliciosa, semelhante a Figura 22, porém de diversos tamanhos.
+
+Observa-se na tabela 1 que o tempo de resposta da aplicação aproximadamente dobra a cada caractere adicionado na string de entrada. Isto é, a ordem de crescimento do tempo é exponencial em relação ao tamanho da entrada. Pode-se estimar que, nesse exemplo, com quarenta caracteres o tempo de resposta seria de aproximadamente três horas e trinta minutos. O que significaria uma indisponibilidade da aplicação durante todo esse tempo. É claro que esse tempo depende de muitos fatores como por exemplo o poder computacional do servidor que está executando a aplicação. Mesmo assim, se sua aplicação roda em um servidor cem vezes mais rápido do que o usado neste exemplo, com apenas quarenta caracteres seria gerada uma indisponibilidade de dois minutos, que é uma eternidade na web.
+
+Goldberg et al (2019), recomendam usar, quando possível, uma biblioteca de validação, como por exemplo a validator.js já citada na seção 4.4. Quando for necessário usar uma expressão regular recomendam o uso da biblioteca safe-regex, que detecta expressões regulares potencialmente vulneráveis a ataques de negação de serviço. Os autores ainda recomendam validar o tamanho máximo da entrada antes de realizar qualquer operação com a mesma (incluindo testes com regex). Pois assim evita-se que, caso haja uma vulnerabilidade, o atacante não tenha o poder de usar uma entrada muito grande, minimizando os danos.
+
+
+
+
+## Boas Práticas
+
+
+Este capítulo destaca algumas boas práticas em Node.js relacionadas a segurança da informação, principalmente no aspecto de disponibilidade. O objetivo é mostrar ações que podem evitar uma variedade de vulnerabilidades em aplicações e aumentar consideravelmente a segurança da mesma. A principal base deste capítulo é o maior guia de boas práticas de Node.js atualmente, mantido por Goldberg et al (2019). O guia conta com 82 boas práticas, no momento de escrita deste trabalho, e é constantemente atualizado e expandido pelos responsáveis e por contribuições da comunidade. Algumas das boas práticas deste guia, principalmente relacionadas a negação de serviço, são listadas a seguir:
+
+- Uma das principais boas práticas em Node.js é executar o Node.js como usuário que não seja root ou administrador do sistema. Isso é importante pois os pacotes de terceiros do Node.js têm acesso à áreas críticas do sistema, como por exemplo o sistema de arquivos. Caso a aplicação possua um pacote contendo código malicioso, e esteja executando em modo root, o atacante tem acesso e permissão para ler, escrever e excluir arquivos importantes do sistema.
+
+- Existe um dilema, uma aplicação web precisa de acesso a porta 80 ou 443, e essas portas só podem ser acessadas por um usuário root. A solução é uma outra boa prática: usar um proxy reverso. Os autores usam o Nginx como exemplo, que redireciona as requisições a aplicação Node.js. Além disso recomendam que tudo o que for possível seja delegado ao proxy reverso, como por exemplo servir arquivos estáticos, TLS (Transport Layer Security) e gzip. Como já visto, o Node.js é eficiente para requisições de entrada e saída. Porém outras operações como servir arquivos, criptografia e compactação de arquivos, não são compatíveis com a filosofia single-threaded não bloqueante do Node.js. Delegar esse tipo de operações para um proxy reverso faz a aplicação Node.js se comportar de forma mais eficiente, aumentando a disponibilidade.
+
+- Outra prática é utilizar todos núcleos do processador. Como já visto o Node.js é single-threaded, ou seja, executa em apenas um núcleo processador. Na prática isso não é ideal pois todos servidores atuais possuem processadores com vários núcleos. Não por acaso, o Node.js possui um módulo nativo para criação de clusters, que com poucas linhas de código permite o balanceamento de carga entre todos núcleos do processador disponíveis. Ainda mais fácil é o uso do pacote terceirizado PM2, já discutido na seção 3.2 deste trabalho.
+
+- O PM2 também é útil para mais uma boa prática. Saber quando é necessário finalizar e reiniciar o processo em caso de erro. Pois nem sempre que ocorre um erro é necessário reiniciar, as vezes apenas registrar o erro em um log é o suficiente. Além disso deve se evitar reiniciar o processo quando o erro é gerado a partir da entrada de um usuário. Os autores dão como exemplo o envio de uma entrada JSON (JavaScript Object Notation) vazia para uma aplicação que não valida esse tipo de entrada. Se isso gerar um erro e reiniciar o processo, um atacante pode gerar várias requisições com uma entrada vazia e reiniciar o processo várias vezes consecutivas em pouco espaço de tempo, causando uma negação de serviço.
+
+- É importante medir e monitorar os recursos do servidor, principalmente memória e CPU. Para evitar o vazamento de memória os autores sugerem por exemplo evitar o uso de variáveis globais e funções anônimas. Para o monitoramento os autores destacam soluções de monitoramento de fornecedores de nuvem, como por exemplo AWS CloudWatch e Google StackDriver. Os autores ainda indicam o uso de APM (Application Performance Management), que é o monitoramento e gerenciamento de desempenho e disponibilidade de aplicações. Os autores ainda sugerem o uso de smart logging, que consiste em registrar, agrupar e visualizar os logs de forma inteligente, de preferência utilizando bibliotecas especializadas nisso.
+
+- Outra boa prática em Node.js é definir a variável de ambiente NODE_ENV igual a production. Definindo esse valor para essa variável de ambiente, remove a aplicação do modo de desenvolvimento (que é o padrão) e a coloca em modo de produção. Segundo os autores, isso faz com que o número de requisições que o Node.js pode manipular aumente cerca de dois terços. Além disso o uso de CPU diminui um pouco. Na prática a aplicação três vezes mais rápida segundo os autores. Além disso nesse modo os detalhes de erros não são exibidos para o usuário, ao invés disso é exibida uma mensagem de erro genérica quando ocorre um erro. Isso é importante pois quanto menos detalhes um atacante mal-intencionado souber mais difícil dele achar uma vulnerabilidade.
+
+- Também é recomendado limitar requisições simultâneas, utilizando bibliotecas como express-rate-limit visto na seção 3.1 deste trabalho. Os autores destacam principalmente a limitação de requisições para rotas de login, a fim de evitar ataques de força bruta. Outra biblioteca indicada pelos autores é a express-brute, cujo diferencial é a capacidade de impor o limite compartilhado entre os clusters da aplicação.
+
+A documentação do Node.js destaca a boa prática de validar o tamanho da entrada do usuário, antes de qualquer outro tipo de verificação. Pois uma entrada muito grande pode causar uma negação de serviço. O exemplo dado na documentação do Node.js é o uso de uma entrada JSON muito grande, que na maioria dos casos precisa passar por processos de conversão de JSON para string ou viceversa. E esse tipo de operação é muito demorada e usa muito processamento, podendo causar uma negação de serviço. E também como já foi visto no capítulo 4, um caractere a mais pode dobrar o tempo de execução de uma expressão regular
+vulnerável.
+
+Düüna (2016) destaca algumas boas práticas para se evitar ataques de negação de serviço através de funções assimétricas. Funções assimétricas são aquelas cujo tempo de execução dependem do tamanho da entrada do usuário. A primeira recomendação do autor é evitar funções assimétricas quando possível. Mas algumas vezes não existe uma maneira de evitá-las, então o autor recomenda limitar o tamanho da entrada, como foi visto no parágrafo anterior. Düüna (2016) ainda recomenda que apenas usuários autenticados possam usar de funções assimétricas, diminuindo a possibilidade de ataques de negação de serviço.
+
+
+
+
+## Considerações Finais
+
+
+Este trabalho mostrou conceitos de segurança da informação como vulnerabilidade, ameaça, disponibilidade e negação de serviço. Além disso foram vistas as vulnerabilidades de negação de serviço em aplicações Node.js mais comuns e como evitá-las.
+
+Foi discutido o funcionamento do Node.js, a sua natureza single-threaded não bloqueante, o loop de eventos e a importância de não o bloquear. Estudou-se também a diferença entre códigos síncronos, assíncronos com buffer e assíncronos com streams.
+
+Concluiu-se que em situações que o bloqueio não causa danos, ou seja, antes da execução entrar no loop de eventos, é preferível o uso de código síncrono, pois em geral é mais rápido. Já em situações em que o bloqueio é danoso, ou seja, a aplicação já está executando no loop de eventos e recebendo requisições de vários usuários, é necessário o uso de código assíncrono.
+
+Discutiu-se também sobre bibliotecas, como encontrar vulnerabilidades nelas, e exemplos de bibliotecas específicas para segurança. Concluiu-se que o uso de bibliotecas deve ser cauteloso, considerando-se quesitos como popularidade, manutenção e qualidade. E ainda que algumas bibliotecas focadas em segurança podem reduzir consideravelmente o risco de ameaças em uma aplicação com apenas algumas poucas linhas de código.
+
+Verificou-se também a importância de se utilizar expressões regulares de forma segura. Podendo se aproveitar das vantagens delas sem comprometer a segurança, principalmente a disponibilidade, da aplicação.
+
+Também se observou algumas boas práticas em Node.js que ajudam a mitigar vulnerabilidades e aumentar a disponibilidade de aplicações.
+
+É importante também destacar que as vulnerabilidades vistas neste trabalho não correspondem a totalidade das mesmas em aplicações Node.js. Existem outras vulnerabilidades que se relacionam por exemplo com serviços de terceiros para hospedagem e manutenção da aplicação, recursos de hardware disponíveis, recursos humanos, entre outros. Como visto, existem vulnerabilidades de outras naturezas além de negação de serviço, como por exemplo: injeção de código, cross-site-script e roubo de sessão. É de extrema importância proteger a aplicação contra esses tipos de vulnerabilidades também. Isso é possível usando uma variedade de políticas, controles e técnicas. Por exemplo hardening, que consiste em implementar medidas de segurança no servidor, na rede ou na organização.
+
+Conclui-se assim que muitas vulnerabilidades de negação de serviço podem ser evitadas tomando-se medidas mostradas neste trabalho. No ambiente de segurança da informação, novas tecnologias e técnicas surgem a todo momento, tanto para ajudar na segurança quanto para tentar quebrá-la. Portanto é importante também manter-se sempre atualizado sobre novos tipos de vulnerabilidades, ameaças e como combatê-las, para que suas aplicações estejam sempre protegidas da melhor maneira possível.
+
+
+
+
+## Referências Bibliográficas
+
+
+BELDER, BERT. Everything You Need to Know About Node.js Event Loop. In: Node.js Interactive 2016, Vancouver, 24 set. 2016. Disponível em: <https://www.youtube.com/watch?v=PNa9OMajw9w> Acesso em: 20 fev. 2019.
+
+CASCIARO, Mario; MAMMINO, Luciano. Node.js Design Patterns. 2. ed. Birmingham: Packt Publishing, 2016.
+
+CELEBRATE. Biblioteca para aplicações Node.js/Express para validação de dados, 2019. Disponível em: <https://github.com/arb/celebrate#readme> Acesso em: 04 mar. 2019.
+
+COLLINA, Matteo. Protecting Node.js from uncontrolled resource consumption headers attacks. 28 nov. 2018. Disponível em: <https://www.nearform.com/blog/protecting-node-js-from-uncontrolled-resourceconsumption-headers-attacks/> Acesso em: 20 fev. 2019.
+
+DAHL, Ryan. 10 Things I Regret About Node.js. In: JSConf EU 2018, Berlin, 6 jun. 2018. Disponível em: <https://www.youtube.com/watch?v=M3BM9TB-8yA> Acesso em: 20 fev. 2019.
+
+DAVIS, James C. A Sense of Time for JavaScript and Node.js. In: USENIX Security ‘18, Santa Clara, 18 set. 2018. Disponível em: <https://www.youtube.com/watch?v=Dm7Xyw3KueY> Acesso em: 20 fev. 2019.
+
+DE TURCKHEIM, Vladimir. Node.js Applicative DoS Through MongoDB Injection. In: Node.js Interactive 2018, Vancouver, 19 out. 2018. Disponível em: <https://www.youtube.com/watch?v=xJWZsoYmsIE> Acesso em: 20 fev. 2019.
+
+DÜÜNA, Karl; RASHID, Fahmida Y. (Ed.). Secure Your Node.js Web Application. Raleigh: Pragmatic Programmers LLC, 2016.
+
+EXPRESS. Production Best Practices: Security. Boas práticas de segurança para aplicações Node.js/Express. Disponível em: <https://expressjs.com/en/advanced/best-practice-security.html> Acesso em: 20 fev. 2019.
+
+EXPRESS RATE LIMIT. Biblioteca para aplicações Node.js/Express que limita o número de requisições a um servidor http, 2019. Disponível em: <https://github.com/nfriedly/express-rate-limit> Acesso em: 03 mar. 2019.
+
+GOLDBERG, Yoni. et al. Node.js Best Practices. 2019. Disponível em: <https://github.com/i0natan/nodebestpractices> Acesso em: 17 abr. 2019.
+
+HELMET. Biblioteca para aplicações Node.js/Express que ajuda a proteger aplicações configurando cabeçalhos http, 2019. Disponível em: <https://helmetjs.github.io/> Acesso em: 03 mar. 2019.
+
+JOI. Biblioteca para aplicações Node.js que valida dados, 2019. Disponível em: <https://github.com/hapijs/joi>. Acesso em: 04 mar. 2019.
+
+KANTOR, Ilya. et al. The Modern JavaScript Tutorial. Disponível em: <https://javascript.info/> Acesso em: 11 mar. 2019.
+
+MUELLER, John Paul. Security for Web Developers. 1. Ed. Sebastopol: O’Reilly Media Inc, 2016.
+
+NAHARI, Hadi; KRUTZ, Ronald L. Web Commerce Security Design and Development. Indianapolis: Wiley Publishing Inc, 2011.
+
+NODE.JS. Don’t Block the Event Loop (or the Worker Pool). Disponível em: <https://nodejs.org/en/docs/guides/dont-block-the-event-loop/> Acesso em: 20 fev. 2019.
+
+NODE.JS. November 2018 Security Releases. Disponível em: <https://nodejs.org/en/blog/vulnerability/november-2018-security-releases/> Acesso em: 20 fev. 2019.
+
+NODE.JS. Overview of Blocking vs. Non-Blocking. Disponível em: <https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/> Acesso em: 20 fev. 2019.
+
+NODE.JS. The Node.js Event Loop, Timers and process.nextTick(). Disponível em: <https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/> Acesso em: 20 fev. 2019.
+
+NODE.JS. The Node.js Event Loop, Timers and process.nextTick(). Disponível em: <https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/> Acesso em: 20 fev. 2019.
+
+NPM Security Advisories. Banco de dados oficial de vulnerabilidades em bibliotecas distribuídos pelo NPM, 2019. Disponível em: <https://www.npmjs.com/advisories>. Acesso em: 20 fev. 2019.
+
+NPMS. Ferramenta de busca de bibliotecas para Node.js. Disponível em: <https://npms.io/> Acesso em: 20 fev. 2019.
+
+O’HANLEY, Richard (Ed.); TILLER, James S. (Ed.). Information Security Management Handbook. 6. ed. Boca Raton: CRC Press, 2014.
+
+OPEN WEB APPLICATION SECURITY PROJECT. Denial of Service. 2 fev. 2015. Disponível em: <https://www.owasp.org/index.php/Denial_of_Service> Acesso em: 20 fev. 2019.
+
+OPEN WEB APPLICATION SECURITY PROJECT. Regular expression Denial of Service - ReDoS. 2 fev. 2015. Disponível em: <https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS> Acesso em: 20 fev. 2019.
+
+PELTIER, Thomas R. Information Security Fundamentals. 2. ed. Boca Raton: CRC Press, 2014.
+
+PM2. Biblioteca para aplicações Node.js/Express que gerencia processos, 2019. Disponível em: <https://pm2.io/doc/en/runtime/overview/> Acesso em: 03 mar. 2019.
+
+RHODES-OUSLEY, Mark. Information Security - The Complete Reference. 2. ed. New York: McGraw-Hill Education, 2013
+
+SAFE-REGEX. Biblioteca para aplicações Node.js que detecta expressões regulares vulneráveis, 2019. Disponível em: <https://github.com/davisjam/safe-regex> Acesso em: 26 mar. 2019.
+
+SAMUEL, Mike. A Node.js Security Roadmap. In: JSConf EU 2018, Berlin, 17 jul. 2018. Disponível em: <https://www.youtube.com/watch?v=1Gun2lRb5Gw> Acesso em: 20 fev. 2019.
+
+SHARMA, Tarun. Secure Node JS Apps. 24 jun. 2018. Disponível em: <https://medium.com/@tkssharma/secure-node-js-apps-7613973b6971> Acesso em: 20 fev. 2019.
+
+SIMPSON, Kyle. You Don’t Know JS: Async & Performance. Sebastopol : O’Reilly Media, 2015.
+
+SNYK. Empresa que mantém bancos de dados de vulnerabilidades em várias bibliotecas de código aberto, 2019. Disponível em: <https://snyk.io/vuln/> Acesso em: 20 fev. 2019.
+
+STAICU, Cristian-Alexandru. Freezing the Web: A Study of ReDoS Vulnerabilities in JavaScript-based Web Servers. In: USENIX Security ‘18, Santa Clara, 18 set. 2018. Disponível em: <https://www.youtube.com/watch?v=612mO3Ieexs> Acesso em: 20 fev. 2019.
+
+TEIXEIRA, Pedro. Professional Node.js. Indianapolis: John Wiley & Sons Inc, 2013.
+
+TRIBUNAL DE CONTAS DA UNIÃO. Boas Práticas em Segurança da Informação. 4. ed. Brasília: TCU, Secretaria de Fiscalização de Tecnologia da Informação, 2012.
+
+VALIDATOR.JS. Biblioteca para aplicações Node.js que valida dados, 2019. Disponível em: <https://github.com/chriso/validator.js>. Acesso em: 04 mar. 2019.
+
+WHITMAN, Michael E.; MATTORD, Hebert J. Principles of Information Security. 4. ed. Boston: Course Technology, 2011.
+
+
+
+
+## Apêndice A
+
+
+Biblioteca crono.js, utilizada para cronometrar o tempo de execução nos exemplos da seção 2.5.
+
+
+##### Figura 23: crono.js
+
+![crono.js](/img/23.png)
+
+*Fonte: Autoria Própria*
