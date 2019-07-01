@@ -81,7 +81,7 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 
 
 - APM - Application Performance Management
-- CEP - Código de Endereçamento Postal
+- CEP - Brazilian ZIP code
 - CPS - Content Security Policy
 - CPU - Central Processing Unit
 - DNS - Domain Name System
@@ -94,7 +94,7 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 - I/O - Input/Output
 - JS - JavaScript
 - JSON - JavaScript Object Notation
-- ms - milissegundos
+- ms - milliseconds
 - REDOS - Regular Expression Denial of Service
 - regex - Regular Expressions
 - SQL - Structured Query Language
@@ -133,106 +133,106 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 
 
 
-## Introdução
+## Introduction
 
 
-Node.js é uma plataforma de desenvolvimento construída em cima do motor de JavaScript do Google Chrome. JavaScript é a linguagem de programação padrão que os navegadores atuais utilizam principalmente para criar iterações entre o usuário e a página web. A plataforma Node.js permite que programas escritos em JavaScript sejam executados fora de um navegador, assim é possível criar aplicações completas escritas em JavaScript. O Node.js é usado principalmente para o desenvolvimento de aplicações web escaláveis. Foi lançado em 2009 e sua popularidade só aumentou desde então. Porém o crescimento da popularidade também atraiu hackers malintencionados. 
+Node.js is a development platform built on top of the Google Chrome JavaScript engine. JavaScript is the default programming language that today's browsers primarily use to create iterations between the user and the web page. The Node.js platform allows programs written in JavaScript to run outside a browser, so you can create complete applications written in JavaScript. Node.js is mainly used for the development of scalable web applications. It was released in 2009 and its popularity has only increased since then. But growing popularity also attracted malicious hackers.
 
-Quando um programador cria uma aplicação, existe a possibilidade de a mesma conter vulnerabilidades provenientes da própria linguagem ou da plataforma utilizada. Por exemplo algumas linguagens, como JavaScript e SQL, não interpretam caracteres especiais automaticamente, o que pode criar uma brecha para injeção de código malicioso. Por isso é muito importante que o programador conheça todas vulnerabilidades de sua ferramenta de trabalho e como combatê-las no momento de escrita do código.
+When a programmer creates an application, it may contain vulnerabilities from the language or platform used. For example, some languages, such as JavaScript and SQL, do not interpret special characters automatically, which can create a breach for malicious code injection. So it is very important that the programmer knows all vulnerabilities of his work tool and how to combat them at the time of writing the code.
 
-Este trabalho apresenta as vulnerabilidades de negação de serviço mais comuns em Node.js e o que é possível fazer na hora de escrever o código para minimizar essas vulnerabilidades.
+This work presents the most common denial of service vulnerabilities in Node.js and what you can do at the time of writing the code to minimize these vulnerabilities.
 
-No primeiro capítulo estabelecem-se conceitos essenciais para o trabalho, como por exemplo: JavaScript, Node.js, Vulnerabilidades, Ameaças, Segurança da Informação, Disponibilidade, Negação de Serviço, entre outros.
+The first chapter establishes essential concepts for the work, such as: JavaScript, Node.js, Vulnerabilities, Threats, Information Security, Availability, Denial of Service, among others.
 
-Em seguida no segundo capítulo fala-se sobre a importância de escrever códigos que não bloqueiam o loop de eventos em aplicações Node.js, e como a falha em fazer o mesmo pode causar negação de serviço em uma aplicação.
+Then in the second chapter we talk about the importance of writing codes that do not block the loop of events in Node.js applications, and how failure to do so can cause denial of service in an application.
 
-No terceiro capítulo discute-se os pontos positivos e negativos das bibliotecas disponíveis para Node.js, os cuidados necessários com elas e como identificar quais bibliotecas apresentam vulnerabilidades conhecidas.
+The third chapter discusses the strengths and weaknesses of libraries available to Node.js, the necessary care with them, and how to identify which libraries have known vulnerabilities.
 
-Em seguida no capítulo quatro fala-se sobre vulnerabilidades de negação de serviço causada por expressões regulares mal formuladas.
+Next in chapter four is talked about denial of service vulnerabilities caused by badly formulated regular expressions.
 
-Por fim no quinto capítulo apresenta-se outras boas práticas para mitigar vulnerabilidades no código de aplicações Node.js.
+Finally, the fifth chapter presents other best practices for mitigating vulnerabilities in Node.js applications code.
 
-O problema que este trabalho tratou é o fato de desenvolvedores muitas vezes não dedicarem a devida atenção ou não saberem como combater vulnerabilidades, e criam códigos com várias brechas que podem ser exploradas por pessoas malintencionadas e algumas vezes até por usuários legítimos sem intenção, causando danos a organização responsável pela aplicação.
+The problem this paper addresses is that developers often do not give enough attention or do not know how to combat vulnerabilities, and create codes with multiple loopholes that can be exploited by malicious people and sometimes even by unintentional legitimate users, causing damage the organization responsible for implementation.
 
-A pergunta que este trabalho procurou responder é: como é possível mitigar as vulnerabilidades de negação de serviço em uma aplicação Node.js no momento em que o código é escrito?
+The question this paper tried to answer is: How can you mitigate denial of service vulnerabilities in a Node.js application at the time the code is written?
 
-A hipótese do trabalho foi conhecer quais são as principais vulnerabilidades de negação de serviço em aplicações Node.js, como combatê-las, e ajudar os desenvolvedores a criarem aplicações mais seguras. Beneficiando usuários, clientes e aos próprios desenvolvedores.
+The paper's hypothesis was to find out what the major denial-of-service vulnerabilities in Node.js applications are, how to combat them, and help developers build safer applications. Benefiting users, customers and the developers themselves.
 
-O objetivo geral foi apresentar algumas vulnerabilidades de negação de serviço mais comuns e mostrar como é possível combatê-las na fase de desenvolvimento de aplicações Node.js.
+The overall goal was to introduce some of the most common denial of service vulnerabilities and show how you can combat them in the Node.js.
 
-Os objetivos específicos deste trabalho foram: relacionar vulnerabilidades de negação de serviço, explicando como elas podem ser exploradas e os danos que podem causar, a fim de mostrar a importância de combatê-las; Dar soluções para o desenvolvimento de aplicações protegidas contra tais vulnerabilidades, ensinando técnicas, conceitos e apresentando bibliotecas, módulos ou pacotes desenvolvidos especificamente para combater essas vulnerabilidades; Conscientizar principalmente desenvolvedores de aplicações Node.js de que é preciso conhecer e reduzir as vulnerabilidades de suas aplicações, e lembrar que além disso existem outras atividades que devem ser feitas para aumentar a segurança da aplicação.
+The specific objectives of this work were: to relate denial of service vulnerabilities, explaining how they can be exploited and the damages they can cause, in order to show the importance of denying them; Provide solutions for the development of applications protected against such vulnerabilities, teaching techniques, concepts and presenting libraries, modules or packages specifically designed to combat these vulnerabilities; Raise awareness among Node.js application developers that you need to know and reduce the vulnerabilities of your applications, and remember that in addition there are other activities that must be done to increase the security of the application.
 
-Node.js é uma tecnologia relativamente nova que ganhou popularidade rapidamente, por esse motivo o número de desenvolvedores que realmente tratam a segurança de suas aplicações com a devida importância ainda é pequeno. Portanto existe uma necessidade de aumentar a conscientização sobre a importância de tentar reduzir as possíveis vulnerabilidades de uma aplicação.
+Node.js is a relatively new technology that has rapidly gained popularity, so the number of developers who truly treat the security of their applications with due importance is still small. So there is a need to raise awareness of the importance of trying to reduce the potential vulnerabilities of an application.
 
-O método utilizado foi a pesquisa bibliográfica, realizada em livros e sites relacionados a segurança de aplicações web, Node.js, e combate a vulnerabilidades.
-
-
-[Voltar ao Sumário](#Sumário)
+The method used was the bibliographic research, carried out in books and websites related to web application security, Node.js, and vulnerability combat.
 
 
-## 1 - Conceitos Básicos
+[Back to Summary](#Summary)
 
 
-Neste capítulo explica-se de forma sucinta alguns conceitos básicos úteis para o entendimento deste trabalho. Esses conceitos são: segurança da informação, disponibilidade, integridade, confidencialidade, vulnerabilidade, ameaça, frontend, backend, aplicação web, JavaScript, Node.js e negação de serviço.
+## 1 - Basic Concepts
 
 
-### 1.1 - Segurança da Informação
+This chapter briefly explains some basic concepts useful for understanding this work. These concepts are: information security, availability, integrity, confidentiality, vulnerability, threat, frontend, backend, web application, JavaScript, Node.js and denial of service.
 
 
-Segundo Peltier (2014) o objetivo da segurança da informação é proteger recursos importantes de uma organização, não somente as informações, mas também recursos físicos, financeiros, legais, funcionários, reputação, entre outros. O autor ainda ressalta que os objetivos da segurança da informação devem se alinhar com os objetivos da empresa, deve ajudar a alcançá-los não atrapalhar. E também todos níveis da organização devem se preocupar e se conscientizar sobre aspectos relacionados à segurança da informação.
-
-Integridade, confidencialidade e disponibilidade são os três principais conceitos de segurança da informação, que são detalhados a seguir.
-
-Whitman e Mattord (2011) dizem que uma informação tem integridade quando ela é inteira, completa e não corrompida. Segundo eles a informação deixa de ser íntegra quando exposta à corrupção, danos, destruição ou outra interrupção de seu estado autêntico. Os autores ainda explicam que uma forma de verificar a integridade de uma informação é o uso de algoritmos Hash que geram um valor único para um arquivo e caso ocorra qualquer modificação no mesmo a Hash é alterada.
-
-O Tribunal De Contas da União (2012) define confidencialidade como “[...] garantia de que somente pessoas autorizadas tenham acesso às informações armazenadas ou transmitidas por meio de redes de comunicação.” Segundo Whitman e Mattord (2011) algumas das medidas que podem ser tomadas para proteger a confidencialidade da informação são: classificar o nível de confidencialidade da informação, armazenar as informações em locais seguros, aplicar políticas de segurança, educar os usuários e os responsáveis pela informação.
-
-O último dos três principais conceitos de segurança da informação é a disponibilidade:
-
-> Consiste na garantia de que as informações estejam acessíveis às pessoas e aos processos autorizados, a qualquer momento requerido, durante o período acordado entre os gestores da informação e a área de informática. Manter a disponibilidade de informações pressupõe garantir a prestação contínua do serviço, sem interrupções no fornecimento de informações para quem é de direito. (Tribunal de Contas da União, 2012)
-
-Disponibilidade é o principal conceito de segurança da informação para este trabalho, pois está diretamente relacionada com negação de serviço.
-
-Vulnerabilidade é um ponto fraco ou falha em um sistema ou mecanismo de proteção que o abre para ataques ou danos. (Whitman; Mattord, 2011). Sendo vulnerabilidade um ponto fraco ou uma falha é possível fortalecer esse ponto ou corrigir tal falha. Neste trabalho estudam-se vulnerabilidades que criam oportunidades para ataques de negação de serviço e buscam-se soluções para reduzir essas falhas ou pontos fracos.
-
-Segundo Whitman e Mattord (2011) uma ameaça é uma categoria de pessoas, objetos ou outras entidades que podem causar danos a um recurso da organização. Eles ainda definem um agente de ameaça como um elemento específico de uma ameaça, por exemplo hackers são uma ameaça, enquanto um hacker específico é um agente da ameaça. Os autores ainda ressaltam que ameaças sempre estarão presentes, e podem ter o propósito de atingir um alvo determinado ou não serem direcionadas especificamente à um alvo, mas sim a qualquer organização que apresente a vulnerabilidade explorada pelo agente da ameaça.
+### 1.1 - Information Security
 
 
-### 1.2 - Aplicações Web
+According to Peltier (2014), the goal of information security is to protect important resources of an organization, not only information, but also physical, financial, legal, employee, reputation, and other resources. The author further emphasizes that information security objectives must align with the company's objectives, should help to achieve them not to disrupt. And all levels of the organization must also be concerned and aware of information security aspects.
+
+Integrity, confidentiality and availability are the three main concepts of information security, which are detailed below.
+
+Whitman and Mattord (2011) say that information has integrity when it is whole, complete and not corrupted. According to them the information ceases to be complete when exposed to corruption, damage, destruction or other interruption of its authentic state. The authors further explain that one way to verify the integrity of an information is to use Hash algorithms that generate a unique value for a file and in case any modification occurs in it the hash is changed.
+
+The European Court of Auditors defines confidentiality as "[...] a guarantee that only authorized persons have access to information stored or transmitted through communication networks." According to Whitman and Mattord (2011), some of the measures that can be taken to protect the confidentiality of information: classify the level of confidentiality of information, store information in secure locations, enforce security policies, educate users and those responsible for information.
+
+The last of the three main concepts of information security is availability:
+
+> Consists of ensuring that the information is accessible to the authorized persons and processes at any time during the period agreed between the information managers and the information technology area. Maintaining the availability of information presupposes ensuring the continuous provision of the service, without interruptions in the provision of information for the right person. (TCU, 2012)
+
+Availability is the main concept of information security for this work, because it is directly related to denial of service.
+
+Vulnerability is a weakness or failure of a protection system or mechanism that opens it for attacks or damages. (Whitman and Mattord, 2011). Being a vulnerability a weakness or a failure it is possible to strengthen this point or correct such failure. In this work we study vulnerabilities that create opportunities for denial-of-service attacks and seek solutions to reduce these weaknesses or weaknesses.
+
+According to Whitman and Mattord (2011) a threat is a category of people, objects or other entities that can cause damage to an organization resource. They even define a threat agent as a specific element of a threat, for example hackers are a threat, while a specific hacker is a threat agent. The authors further point out that threats will always be present, and may be intended to reach a specific target, or not targeted specifically to a target, but to any organization that has vulnerability exploited by the threat agent.
 
 
-Frontend é a parte de uma aplicação que é responsável por interagir com o cliente. No caso de uma aplicação web o frontend é o código que é interpretado pelo navegador do cliente, que formata e gera uma visualização para o cliente, com elementos que ele pode interagir, por exemplo um formulário que pode ser preenchido.
+### 1.2 - Web Applications
 
-Backend é a parte da aplicação que é executada no servidor, geralmente é responsável por regras de negócio, controles de acesso, manipular informações de um banco de dados, autenticação e segurança. Usando o mesmo exemplo citado no frontend, quando um usuário envia o formulário é o backend que é responsável por validar, registrar e processar as informações.
 
-Aplicação Web é um sistema de informação ambientado na Web, ou seja, é uma aplicação cujo backend reside em servidor web e o frontend é interpretado em um programa de acesso à web, que geralmente é um navegador, mas pode ser também, por exemplo, um aplicativo de celular.
+Frontend is the part of an application that is responsible for interacting with the client. In the case of a web application the frontend is the code that is interpreted by the client browser, which formats and generates a visualization for the client, with elements that they can interact with, for example a form that can be filled.
 
-JavaScript é uma linguagem de programação presente na maioria dos websites atuais. Segundo Düüna (2016) JavaScript é uma das linguagens de programação mais incompreendidas do mundo devido a sua história. Inicialmente era chamada de LiveScript, pois foi criada com a intenção de deixar as páginas Web mais ‘vivas’, e era apenas uma linguagem para scripts simples. Recebeu o nome JavaScript em uma tentativa (que deu certo) de se aproveitar da fama da linguagem JAVA, porém as duas não tem nenhuma relação além dessa curiosidade histórica. Hoje é uma linguagem robusta para desenvolvimento de aplicações Web, e tem o nome de ECMAScript, pois é mantida pela organização ECMA (European Computer Manufacturers Association), porém ainda é referida pela maioria dos desenvolvedores e autores de livros como JavaScript. Düüna (2016) ainda destaca que toda ferramenta tem suas peculiaridades, e devido ao crescimento e transformação, por muito tempo não padronizados, JavaScript possui algumas características que devem ser evitadas ou usadas com cautela seguindo boas práticas para se evitar vulnerabilidades de segurança e outros problemas em aplicações.
+Backend is the part of the application that runs on the server, usually responsible for business rules, access controls, manipulating information from a database, authentication, and security. Using the same example cited in the frontend, when a user submits the form is the backend that is responsible for validating, registering, and processing the information.
+
+Web application is an information system set in the Web, that is, it is an application whose backend resides in web server and the frontend is interpreted in a program of access to the web, that usually is a browser, but can be also, for example, a mobile app.
+
+JavaScript is a programming language found on most current websites. According to Düüna (2016) JavaScript is one of the most misunderstood programming languages ​​in the world because of its history. Initially it was called LiveScript because it was created with the intention of making web pages more 'live', and it was just a language for simple scripts. It received the JavaScript name in an attempt (which worked) to take advantage of the fame of the language JAVA, but the two have no relation beyond this historical curiosity. Today it is a robust language for Web application development and is called ECMAScript because it is maintained by the ECMA (European Computer Manufacturers Association) organization, but is still referred to by most books, developers and authors as JavaScript. Düüna (2016) also points out that every tool has its own peculiarities, and because of the growth and transformation, long non-standardized, JavaScript has some characteristics that should be avoided or used with caution following good practices to avoid security vulnerabilities and other problems in applications.
 
 
 ### 1.3 - Node.js
 
 
-Segundo Düüna (2016) Node.js é uma plataforma desenvolvida a partir do interpretador de JavaScript do Google Chrome: V8, para interpretar códigos escritos em JavaScript do lado do servidor (backend), o que tornou possível criar aplicações web totalmente escritas na linguagem JavaScript. O autor ainda explica que Node.js estende as funcionalidades do JavaScript ligando-o a várias bibliotecas escritas nas linguagens de programação C e C++, e também com módulos que permitem acesso a funcionalidades do sistema operacional, manipular dados binários, e outros tipos de requisições. Permitindo assim que o Node.js acesse arquivos, execute comandos no sistema, receba e responda requisições de rede, ou seja, tudo que um servidor necessita, mas não era possível fazer apenas com JavaScript.
+According to Düüna (2016) Node.js is a platform developed from the Google Chrome JavaScript interpreter: V8, to interpret codes written in server-side JavaScript (backend), which made it possible to create web applications fully written in the JavaScript language. The author also explains that Node.js extends JavaScript functionality by linking it to various libraries written in C and C ++ programming languages, as well as modules that allow access to operating system functionality, manipulate binary data, and other types of requests. Thus allowing Node.js to access files, run commands on the system, receive and respond to network requests, that is, everything a server needs, but it was not possible to do it with just JavaScript.
 
-Düüna (2016) destaca algumas características importantes do Node.js no ponto de vista de segurança. Uma delas é o fato de o Node.js receber e interpretar requisições em apenas uma thread (ou tarefa), ou seja, existe apenas um ponto de entrada e saída de eventos, chamado de loop de eventos (event loop). Essa característica é muito importante para segurança da informação, especialmente no quesito de disponibilidade, pois se algo bloquear o loop de eventos, a aplicação não consegue mais servir os clientes, gerando uma negação de serviço. Estuda-se esse aspecto mais a fundo no próximo capítulo. Outra característica destacada pelo autor é o rico gerenciador de bibliotecas JavaScript utilizadas que é instalado por padrão juntamente ao Node.js, o Node Package Manager (NPM). A vantagem do NPM é que muitas bibliotecas ajudam desenvolvedores a resolverem tarefas, acelerando assim o processo de desenvolvimento de aplicações, porém essas bibliotecas também estão sujeitas a vulnerabilidades. No terceiro capítulo deste trabalho estuda-se sobre bibliotecas e os cuidados necessários ao usá-las.
-
-
-### 1.4 - Negação de Serviço
+Düüna (2016) highlights some important features of Node.js from a security point of view. One of them is the fact that Node.js receives and interprets requests in only one thread (or task), that is, there is only one point of entry and exit of events, called event loop. This feature is very important for information security, especially in the availability issue, because if something blocks the event loop, the application can no longer serve customers, generating a denial of service. This is discussed further in the next chapter. Another feature highlighted by the author is the rich JavaScript library manager that is installed by default alongside Node.js, the Node Package Manager (NPM). The advantage of NPM is that many libraries help developers solve tasks, thus speeding up the application development process, but these libraries are also subject to vulnerabilities. In the third chapter of this work we study libraries and the necessary care in using them.
 
 
-Um ataque de negação de serviço, Denial of Service (DoS), ou ataque de negação de serviço distribuído, Distributed Denial of Service (DDoS), é uma tentativa de fazer um recurso computacional ficar indisponível para os usuários legítimos (Rhodes-Ousley, 2013). Portanto pode-se concluir que uma vulnerabilidade de negação de serviço é uma falha ou ponto fraco de uma aplicação que permite esse tipo de ataque.
-
-Segundo Whitman e Mattord (2011) um ataque DoS é realizado de apenas um ponto, enquanto um ataque DDoS é realizado de várias localizações ao mesmo tempo, geralmente cada um desses pontos é um sistema comprometido, infectado por algum programa malicioso que permite o controle remoto de funções como por exemplo realizar requisições a um servidor.
-
-O’Hanley (2014) diz que um ataque de negação de serviço tem como objetivo negar ou degradar a qualidade de acesso de um usuário legítimo a um serviço ou recurso de rede. O autor classifica os ataques DoS em dois tipos: ataques de desativação de serviço e ataques de enfraquecimento de recursos. O primeiro é caracterizado por altos números de requisições, geralmente por vários clientes, um DDoS, com a intenção de atingir o limite da fila de espera para utilizar o recurso e causando a paralisação do mesmo. Já os ataques de enfraquecimento de recurso geralmente exploram uma falha lógica na aplicação fazendo com que um processo 17 consuma recursos do servidor durante um tempo muito grande, deixando poucos recursos e tempo para o processamento de requisições de usuários legítimos.
-
-Mueller (2016) enfatiza que uma parte importante de um ataque DoS é requisitar uma operação complexa, como por exemplo uma busca, portanto é uma boa ideia exigir autenticação do usuário para realizar esses tipos de operações, criando uma barreira de segurança a mais contra ataques DoS.
-
-Nahari e Krutz categorizam as soluções para combater ataques DoS em dois tipos: preventivas e reativas. Soluções preventivas impedem o ataque tomando medidas de precaução, como por exemplo: filtros, estabelecimento de limites, esconder a localização de recursos e detecção de intrusos. Já as soluções reativas são acionadas durante o ataque e geralmente tem o objetivo de determinar a origem do ataque, alguns exemplos são: marcação de pacotes, testes de conexão e coleta de dados em registros (logs).
+### 1.4 - Denial of Service
 
 
-[Voltar ao Sumário](#Sumário)
+A Denial of Service (Denial of Service) attack, or Distributed Denial of Service (DDoS) attack, is an attempt to make a computing resource unavailable to legitimate users (Rhodes-Ousley, 2013 ). Therefore it can be concluded that a denial of service vulnerability is a failure or weakness of an application that allows this type of attack.
+
+According to Whitman and Mattord (2011) a DoS attack is performed at only one point while a DDoS attack is performed from multiple locations at the same time, usually each of these points is a compromised system, infected by some malicious program that allows remote control functions such as making requests to a server.
+
+O'Hanley (2014) says that a denial of service attack is intended to deny or degrade a legitimate user's access quality to a service or network resource. The author classifies DoS attacks into two types: service deactivation attacks and resource depletion attacks. The first one is characterized by high numbers of requests, usually by several clients, a DDoS, with the intention of reaching the limit of the queue to use the resource and causing the resource to stop. On the other hand resource-thinning attacks often exploit a logical flaw in the application causing a process to consume server resources for a very long time, leaving fewer resources and time to process legitimate user requests.
+
+Mueller (2016) emphasizes that an important part of a DoS attack is to require a complex operation, such as a search, so it is a good idea to require user authentication to perform these types of operations, creating a further security barrier against DoS attacks.
+
+Nahari and Krutz categorize solutions to combat DoS attacks in two types: preventive and reactive. Preventive solutions prevent attack by taking precautionary measures, such as filters, setting limits, hiding resource locations, and detecting intruders. Already the reactive solutions are triggered during the attack and generally have the purpose of determining the origin of the attack, some examples are: marking of packages, tests of connection and data collection in registries (logs).
+
+
+[Back to Summary](#Summary)
 
 
 ## 2 - O Loop de Eventos
