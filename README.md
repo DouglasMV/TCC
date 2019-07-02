@@ -2,7 +2,7 @@
 
 Trabalho de Conclusão de Curso do curso superior de Tecnologia em Segurança da Informação.
 
-[English version (w.i.p.)](/README-english.md)
+*[English Version](/README-english.md)*
 
 ### Faculdade de Tecnologia de Americana
 ### Curso Superior de Tecnologia em Segurança da Informação
