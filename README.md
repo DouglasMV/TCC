@@ -648,7 +648,7 @@ A Figura 20 mostra um exemplo de expressão regular vulnerável pois não obedec
 
 ##### Figura 22: Usando a aplicação com uma entrada maliciosa
 
-![regex válida](/img/22.png)
+![regex inválida](/img/22.png)
 
 *Fonte: Autoria própria*
 
