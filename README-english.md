@@ -235,191 +235,189 @@ Nahari and Krutz categorize solutions to combat DoS attacks in two types: preven
 [Back to Summary](#Summary)
 
 
-## 2 - O Loop de Eventos
+## 2 - The Event Loop
 
 
-A regra mais importante ao desenvolver aplicações Node.js é não bloquear o loop de eventos, portanto é preciso entender exatamente o que isso significa. Neste capítulo explica-se como o Node.js funciona, o que é o loop de eventos, como ele opera em aplicações Node.js, o que significa bloqueá-lo e como evitar esse bloqueio.
+The most important rule when developing Node.js applications is not to block the event loop, so you need to understand exactly what that means. This chapter explains how Node.js works, what the event loop is, how it operates in Node.js applications, what it means to block it, and how to avoid it.
 
 
-### 2.1 - Bloqueante X Não Bloqueante
+### 2.1 - Blocking X Non-Blocking
 
 
-Primeiro define-se o que é uma thread. Segundo Teixeira (2013) uma thread é uma linha de processo que compartilha a memória de um processo com todas outras threads que existem dentro do mesmo processo. Na prática o que isso significa é que se o processador do computador é por exemplo quad-core, ou seja tem quatro núcleos então ele tem quatro processos executando ao mesmo tempo, e dentro de cada um desses processos podem existir várias threads (várias linhas de processo).
+First is defined what a thread is. According to Teixeira (2013) a thread is a process thread that shares the memory of a process with all other threads that exist within the same process. In practice what this means is that if the computer's processor is for example quad-core, i.e. it has four cores then it has four processes running at the same time, and within each of these processes there may be several threads process).
 
-De uma maneira simplificada pode-se dizer que um bloqueio ocorre quando operações intensas (em relação ao tempo de execução) são realizadas de forma contínua (de uma vez só), ou seja, enquanto a operação não é finalizada outras tarefas pendentes não tem uma oportunidade de executar. Segundo o site oficial do Node.js existem duas motivações principais para não bloquear uma thread de um servidor web: a performance (requisições atendidas por segundo), que é muito maior quando a thread executa apenas tarefas rápidas; e a segurança, pois se for possível bloquear a thread com alguma requisição ou input malicioso, isso cria uma vulnerabilidade que pode ser explorada e causar uma negação de serviço.
+In a simplified way it can be said that a block occurs when heavy operations (in relation to execution time) are carried out continuously (at one time), that is, while the operation is not completed other pending tasks do not have a opportunity to perform. According to the official site of Node.js there are two main reasons for not blocking a thread from a web server: performance (requests served per second), which is much higher when the thread performs only fast tasks; and security, because if it is possible to block the thread with some request or malicious input, this creates a vulnerability that can be exploited and cause a denial of service.
 
-Ryan Dahl(2018) diz que quando ele criou o Node.js, seu objetivo principal era criar uma ferramenta na qual fosse possível desenvolver servidores web não bloqueantes acionados por eventos. Esse tipo de servidor tem melhor performance em aplicações focadas em entrada e saída de dados, Input e Output (I/O), pois não bloqueiam a thread. Até então a maioria dos servidores web eram do tipo baseado em processos, como por exemplo o popular Apache, esse tipo de servidor bloqueia a thread, e por isso usa múltiplas threads para atender vários clientes.
+Ryan Dahl (2018) says that when he created Node.js, his main goal was to create a tool in which to develop non-blocking web servers triggered by events. This type of server has better performance in applications focused on data input and output (I/O), because they do not block the thread. Until then most of the web servers were of the process-based type, such as popular Apache, this type of server blocks the thread, and therefore uses multiple threads to serve multiple clients.
 
-A princípio pode parecer que criar várias threads faz a aplicação ser mais rápida, porém segundo Casciaro e Mammino (2016) existem dois pontos fracos nesse tipo de servidor. O primeiro é o fato de que para cada requisição uma nova thread é criada. E na maior parte do tempo essas threads estão em estado de espera (idle), aguardando I/O do cliente. Isso é ruim pois a criação de threads não é uma operação barata, usa memória e mudanças de contexto. E criar uma thread para realizar uma tarefa simples, deixando-a a maior parte do tempo em estado de espera, não proporciona benefícios, em termos de tempo, no final das contas. O segundo ponto fraco é que cada um dessas threads é bloqueante, ou seja, ela espera uma operação finalizar para poder iniciar outra. No caso de todas ou a maioria das threads do seu servidor estarem ocupados por clientes realizando operações bloqueantes, outros clientes não conseguem usar sua aplicação, gerando uma negação de serviço. Esse tipo de processamento é chamado de paralelo, pois várias operações são realizadas ao mesmo tempo em processos diferentes.
+At first it may seem that creating multiple threads makes the application faster, but according to Casciaro and Mammino (2016) there are two weaknesses in this type of server. The first is the fact that for each request a new thread is created. And most of the time these threads are idle, waiting for I/O from the client. This is bad because thread creation is not a cheap operation, it uses memory and context changes. And creating a thread to accomplish a simple task, leaving it most of the time in standby, does not provide benefits, in terms of time, after all. The second weakness is that each of these threads is blocking, that is, it waits for a finalize operation to start another. In case all or most threads on your server are occupied by clients performing blocking operations, other clients are unable to use your application, generating a denial of service. This type of processing is called a parallel because several operations are performed at the same time in different processes.
 
-Os autores também explicam que em um servidor com apenas uma thread não bloqueante, essa thread quase nunca fica em estado de espera, sempre há operações a serem realizadas. O importante é que essas operações não sejam bloqueantes, ou seja, sejam rápidas. Nesse caso o processo é chamado de simultâneo, pois as funções são divididas em tarefas menores e são realizadas intercaladamente, minimizando o tempo de estado de espera, dando ao usuário a sensação de que foram realizadas ao mesmo tempo. As figuras a seguir ilustram servidores com várias threads em comparação com servidores de apenas uma thread.
+The authors also explain that on a server with only one non-blocking thread, this thread almost never goes into the idle state, there are always operations to be performed. What is important is that these operations are not blocking, that is, they are fast. In this case the process is called concurrent because the functions are divided into smaller tasks and are performed interleaved, minimizing the wait state time, giving the user the feeling that they were performed at the same time. The following figures illustrate multi-threaded servers compared to single-threaded servers.
 
 
-##### Figura 1: Diagrama de um servidor multi-threaded bloqueante
+##### Figure 1: Diagram of a multi-threaded blocking server
 
 ![multi-threaded](/img/1.png)
 
-*Fonte: Casciaro e Mammino (2016)*
+*Source: Casciaro e Mammino (2016)*
 
 
-##### Figura 2: Diagrama de um servidor single-threaded não bloqueante
+##### Figure 2: Diagram of a non-blocking single-threaded server
 
 ![single-threaded](/img/2.png)
 
-*Fonte: Casciaro e Mammino (2016)*
+*Source: Casciaro e Mammino (2016)*
 
 
-Como observa-se nas Figuras 1 e 2, no servidor multi-threaded bloqueante as threads ficam muito tempo no estado de espera (idle), ou seja, ocupando recursos no processador sem realizar nenhuma tarefa. Enquanto no servidor single-threaded não bloqueante, como pode ser observado na Figura 2, o tempo em idle é bem menor, ou seja, não desperdiça muitos recursos de processadores, deixando-os livres para realizar outras tarefas, como por exemplo as funções executadas pelo kernel e pelo o Work Pool, que são discutidas na próxima seção.
+As shown in Figures 1 and 2, in the multi-threaded blocking server, threads stay in the idle state for a long time, that is, taking up resources in the processor without performing any tasks. While in the non-blocking single-threaded server, as can be seen in Figure 2, the time in idle is much smaller, that is, it does not waste many processor resources, leaving them free to perform other tasks, such as the functions performed by the kernel and by the Work Pool, which are discussed in the next section.
 
 
-### 2.2 - O que é o Loop de Eventos
+### 2.2 - What is the Event Loop
 
 
-O loop de eventos é o que permite aplicações Node.js realizarem operações não bloqueantes, ainda que o JavaScript use apenas uma thread. De forma simplificada as responsabilidades do loop de eventos são: redirecionar operações para o kernel do sistema operacional (quando possível) ou para o work pool (um local onde algumas tarefas específicas são executadas), agendar timers, receber e executar callbacks (são funções que executam após uma outra função ter finalizado). Como a maioria dos sistemas operacionais modernos tem um kernel capaz de manter várias threads, eles podem executar operações no plano de fundo quando necessário. Quando essas operações estão finalizadas elas voltam para o loop de eventos para serem executadas na aplicação Node.js. 
+The event loop is what allows Node.js applications to perform non-blocking operations, even though JavaScript uses only one thread. In a simplified way the responsibilities of the event loop are: to redirect operations to the operating system kernel (when possible) or to the work pool (a place where some specific tasks are executed), schedule timers, receive and execute callbacks after another function is finished). Because most modern operating systems have a kernel capable of maintaining multiple threads, they can perform background operations when needed. When these operations are finished they return to the event loop to run in the Node.js. application.
 
-A libuv é uma biblioteca desenvolvida na linguagem C, originalmente foi desenvolvida exclusivamente para possibilitar a natureza single-threaded não bloqueante do Node.js, hoje também é utilizada em outras plataformas. Ela é a responsável pela criação do loop de eventos, do worker pool e de várias funções assíncronas (funções não bloqueantes, discutidas na próxima seção) não disponíveis no kernel dos sistemas operacionais. Na figura 3 mostra-se um diagrama que representa o loop de eventos, baseado na palestra de Belder (2016), um dos desenvolvedores do Node.js e da biblioteca libuv.
-
-
-##### Figura 3: Diagrama do loop de eventos
-
-![loop-de-eventos](/img/3.png)
-
-*Fonte: Adaptado de Belder (2016)*
+Libuv is a library developed in the C language, originally developed exclusively to enable the single-threaded non-blocking nature of Node.js, is now also used on other platforms. It is responsible for creating the event loop, worker pool, and various asynchronous functions (non-blocking functions, discussed in the next section) that are not available in the operating system kernel. Figure 3 shows a diagram representing the events loop, based on Belder's talk (2016), one of the developers of Node.js and the libuv library.
 
 
-Primeiro nota-se as três entidades fora do loop de eventos: Time Heap; Kernel; e Worker Pool. Cada uma delas é responsável por realizar determinados tipos de tarefas, segundo Belder (2016), a principal característica em comum é o número de referências, que nada mais é que o número de tarefas que aquela entidade está realizando ou está aguardando para realizar. Observa-se a seguir quais tipos de tarefa é responsabilidade de cada uma dessas entidades.
+##### Figure 3: Event Loop Diagram
 
-Belder (2016) explica que o Time Heap tem apenas uma responsabilidade que é controlar as chamadas das funções setTimeout (executa uma função, uma única vez, após um período de tempo) e setInterval (executa uma função, várias vezes, a cada intervalo de tempo). Essas funções não são nativas da linguagem JavaScript, porém a maioria das plataformas que executam códigos JavaScript possuem uma implementação delas, como por exemplo os navegadores modernos Chrome e Firefox. O Node.js também tem sua própria implementação dessas funções. O Time Heap retorna uma função callback para o início do loop de eventos quando o tempo determinado for atingido.
+![event-loop](/img/3.png)
 
-Belder (2016) diz que o Kernel é responsável por realizar funções como por exemplo: servidores, sockets de conexão tcp/udp, pipes, entradas de terminal, resoluções DNS (Domain Name System), entre outras. Quando o kernel finaliza essas operações, ele retorna-as ao loop de evento, mais especificamente na fase de callback pool, que se explica mais adiante.
-
-Segundo a documentação oficial do Node.js, o Worker Pool ou também chamado de Thread Pool possui uma variedade de funções assíncronas criadas pela libuv, as quais não existem uma similar no kernel que também seja assíncrona. Alguns exemplos de operações realizadas pelo Worker Pool são: pesquisa de DNS, operações no sistema de arquivo (acesso, leitura, escrita), alguns tipos excepcionais de pipes, streams, entre outros. Assim como o kernel, o Worker Pool retorna as operações finalizada para o callback pool no loop de eventos, para que sejam executadas na aplicação.
-
-Na Figura 3 nota-se cinco quadrados com “JS” escrito dentro dos mesmos, segundo Belder (2016), eles representam os momentos nos quais o loop de evento executa códigos JavaScript. São nesses momentos que referências para o Time Heap, o Kernel e o Worker Pool podem ser criadas, através da invocação de funções implementadas pelo Node.js. Agora discute-se como cada etapa do loop de eventos funciona.
-
-Belder (2016) explica que quando uma aplicação Node.js é iniciada o primeiro passo que ocorre é a leitura e execução do ponto de entrada da aplicação, representado por index.js na Figura 3. No caso de uma aplicação web é nesse momento que o kernel recebe uma referência para começar a “ouvir” requisições HTTPS (Hyper Text Transfer Protocol Secure) ou HTTP (Hyper Text Transfer Protocol).
-
-O autor ainda diz que após todo código inicial ser executado o loop entra na fase dos timers, a qual recebe as funções do Time Heap que já esperaram o tempo determinado a elas e devem ser executadas. Em seguida o loop de eventos executa essas funções recebidas.
-
-A próxima fase, a fase de pool, é a mais importante do loop. Segundo a documentação oficial do Node.js, essa é a fase que recebe callbacks do kernel e do worker pool, ela é responsável por determinar quanto tempo deve aguardar para receber callbacks, gerar uma fila dessas callbacks recebidas e executá-las na ordem FIFO (First In First Out). Caso a fila da fase pool esteja vazia e não existam callbacks aguardando em outras fases (timers, check e close), o loop de evento fica parado na fase de pool até que ela (ou a fase de timers) receba uma callback.
-
-Belder (2016) explica que após todas callbacks das fases timers e pool executarem, entra-se na fase de check, essa fase é responsável por executar callbacks chamadas por uma função de timer especial: setImmediate. Ela é especial justamente por que possui uma fase só para si, enquanto as outras funções de timers são executadas na fase de timers. O nome da função refere-se ao fato de ela ser executada imediatamente após a fase de pool.
-
-A última fase do loop é a fase chamada close. Segundo a documentação oficial do Node.js, ela tem esse nome pois é responsável por verificar se alguma callback ou socket de comunicação foi fechado abruptamente, caso isso ocorra um evento do tipo close é emitido e os recursos usados são “limpos”.
-
-Segundo Belder (2016), quando a fase close termina o loop de eventos verifica o número de referências do Time Heap, Kernel e Worker Pool, caso os três sejam iguais a zero o loop de eventos finaliza, pois se continuasse ele acabaria parando na fase de pool e nunca mais sairia de lá, já que para algum código ser executado seria necessário receber uma callback de alguma referência, e existem zero referências em todos três possíveis lugares. Existem outras duas situações em que o loop de eventos finalizaria: caso haja um erro de runtime não lidado; caso a função process.exit() seja executada em algum momento.
-
-Belder (2016) ainda explica que caso exista pelo menos uma referência em um dos três lugares possíveis (Time Heap, Kernel, Worker Pool) ao final da fase de close, o loop volta para a fase de timers e fecha o loop, ou seja, repete os passos descritos acima a partir da fase de timers. O autor enfatiza que no caso de um servidor web, como na inicialização o kernel recebe uma referência para começar a “ouvir” requisições HTTPS, essa referência sempre estará presente, por isso o servidor web não para mesmo quando não há nenhuma tarefa a ser executada.
+*Source: Adapted from Belder (2016)*
 
 
-### 2.3 - Síncrono X Assíncrono
+First we notice the three entities outside the event loop: Time Heap; Kernel; and Worker Pool. Each of them is responsible for performing certain types of tasks, according to Belder (2016), the main characteristic in common is the number of references, which is nothing more than the number of tasks that entity is performing or is waiting to perform. It is observed next which types of task is responsibility of each one of these entities.
+
+Belder (2016) explains that Time Heap has only one responsibility which is to control the calls of the setTimeout functions (performs a function, once, after a period of time) and setInterval (performs a function, several times, at each interval time). These functions are not native to the JavaScript language, but most platforms that execute JavaScript code have an implementation of them, such as the modern Chrome and Firefox browsers. Node.js also has its own implementation of these functions. Time Heap returns a callback function to the beginning of the event loop when the given time is reached.
+
+Belder (2016) says that the kernel is responsible for performing functions such as: servers, tcp/udp connection sockets, pipes, terminal entries, DNS (Domain Name System) resolutions, among others. When the kernel completes these operations, it returns them to the event loop, more specifically in the callback pool phase, which is explained later.
+
+According to the official documentation of Node.js, the Worker Pool or also called Thread Pool has a variety of asynchronous functions created by libuv, which do not have a similar one in the kernel that is also asynchronous. Some examples of operations performed by the Worker Pool are: DNS lookup, file system operations (access, reading, writing), some exceptional types of pipes, streams, among others. Like the kernel, the Worker Pool returns the completed operations to the callback pool in the event loop, so that they run in the application.
+
+In Figure 3 note five squares with "JS" written inside them, according to Belder (2016), they represent the moments in which the event loop executes JavaScript codes. It is in these moments that references to the Time Heap, Kernel and Worker Pool can be created, by invoking functions implemented by Node.js. We now discuss how each step of the event loop works.
+
+Belder (2016) explains that when a Node.js application is started the first step that occurs is the reading and execution of the application entry point, represented by index.js in Figure 3. In the case of a web application it is at that moment that the kernel receives a reference to begin listening to Hyper Text Transfer Protocol Secure (HTTPS) or Hyper Text Transfer Protocol (HTTP) requests.
+
+The author still says that after all initial code is executed the loop enters the phase of the timers, which receives the functions of the Time Heap that have already waited the time determined to them and must be executed. Then the event loop performs these received functions.
+
+The next phase, the pool phase, is the most important of the loop. According to official Node.js documentation, this is the phase that receives kernel and worker pool callbacks, it is responsible for determining how long to wait for callbacks, to generate a queue of those received callbacks, and to execute them in the FIFO order (First In First Out). If the pool phase queue is empty and there are no callbacks waiting at other stages (timers, check, and close), the event loop is stopped in the pool phase until it (or the timers phase) receives a callback.
+
+Belder (2016) explains that after all callbacks of the timers and pool phases execute, the check phase is entered, this phase is responsible for executing callbacks called by a special timer function: setImmediate. It is special because it has a phase only for itself, while the other timer functions are executed in the timer phase. The function name refers to the fact that it is executed immediately after the pool phase.
+
+The last phase of the loop is the phase called close. According to the official documentation of Node.js, it has this name because it is responsible for verifying if any callback or communication socket was closed abruptly, if this happens a close-type event is issued and the resources used are "clean".
+
+According to Belder (2016), when the close phase ends, the event loop checks the number of references of the Time Heap, Kernel and Worker Pool, if all three are equal to zero the event loop ends, because if it continues it would end up in phase of pool and never again would leave of there, since for some code to be executed would be necessary to receive a callback of some reference, and there are zero references in all three possible places. There are two other situations where the event loop would end: if there is an unhandled runtime error; if the process.exit() function is executed at some point.
+
+Belder (2016) further explains that if there is at least one reference in one of three possible places (Time Heap, Kernel, Worker Pool) at the end of the close phase, the loop returns to the timers phase and closes the loop, repeats the steps described above from the timer phase. The author emphasizes that in the case of a web server, as at boot time the kernel receives a reference to start listening to HTTPS requests, this reference will always be present, so the web server does not stop even when there is no task to execute .
 
 
-Os conceitos de síncrono e assíncrono estão diretamente ligados a regra mais importante do Node.js: não bloquear o loop de eventos. Também é importante não bloquear o Worker Pool, pois ele é responsável por grande parte das tarefas que usam mais recursos do processador.
+### 2.3 - Synchronous X Asynchronous
 
-De maneira simples uma função síncrona realiza todas suas tarefas em sequência e de uma vez só, o que significa que enquanto ela executa, nenhuma outra função tem sua vez na thread. Já uma função assíncrona pode realizar uma tarefa pequena (portanto rápida), pausar, liberando a thread para outra função, e continuar suas tarefas mais tarde. Segundo Casciaro e Mammino (2016) a arquitetura assíncrona e o fato do Node.js ser single-threaded, mudou a maneira com que os desenvolvedores lidam com paralelismo. Pois ao invés de criar uma nova thread para cada nova tarefa, usam funções assíncronas para dar um tempo justo para cada tarefa e reduzir o tempo em estado de espera da thread.
 
-Devido ao fato das funções assíncronas pararem sua execução regularmente, para que o loop de eventos possa checar se existem outras funções, elas levam mais tempo do que uma função síncrona para finalizar. É por isso que muitas das funções disponíveis nas bibliotecas do Node.js têm uma versão síncrona e uma versão assíncrona. Pois se essa função deve ser executada uma única vez na inicialização da aplicação, é mais vantajoso usar a versão síncrona. Porque é mais rápida, e o fato dela ser bloqueante não importa nesse caso pois na inicialização da aplicação não há requisições de clientes ainda.
+The concepts of synchronous and asynchronous are directly linked to the most important rule of Node.js: do not block the event loop. It is also important not to block the Worker Pool because it is responsible for most tasks that use more processor resources.
 
-Segundo Simpson (2015), funções assíncronas ajudam a criar aplicações que não bloqueiam por dois motivos: primeiro porque como elas podem ser divididas em tarefas menores que não precisam ser executadas de uma vez, é possível executar outras funções entre essas tarefas; o segundo motivo é o fato de que algumas funções precisam de um tempo em idle, por exemplo para aguardar o recebimento de dados de outra aplicação, e isso pode ser feito enquanto outras funções executam. Já em uma função síncrona esse tempo de espera deixaria a thread em estado idle, ou seja, bloqueando a execução de outras tarefas.
+In a simple way a synchronous function performs all its tasks in sequence and all at once, which means that while it executes, no other function has its turn in the thread. An asynchronous function can perform a small task (therefore fast), pause, release the thread to another function, and continue its tasks later. According to Casciaro and Mammino (2016) the asynchronous architecture and the fact that Node.js is single-threaded, has changed the way developers deal with parallelism. Because instead of creating a new thread for each new task, they use asynchronous functions to give a fair time for each task and reduce the wait time of the thread.
 
-Exemplificando, em determinado momento um programa deve executar uma função que faz essencialmente duas tarefas: requisita dados de uma aplicação externa, e em seguida faz um cálculo simples com esses dados. A requisição leva 5 ms (milissegundos), e o cálculo 15 ms, porém o tempo de espera para a aplicação externa responder a requisição é de 780 ms. Se essa função for realizada de forma síncrona (bloqueante) a thread será ocupado por essa função por 800 ms e durante esse tempo nenhuma outra função poderá ser executada. Já se a função for assíncrona o programa executa a tarefa de requisição em 5 ms, retorna o controle do thread para o loop de eventos que pode realizar outras funções que estão na fila de espera e quando a aplicação externa retornar os dados (780 ms depois da requisição) uma callback com esses dados entra na fila de execução, e quando chegar sua vez é executada.
+Because asynchronous functions stop their execution on a regular basis so that the event loop can check for other functions, it takes longer than a synchronous function to terminate. This is why many of the functions available in Node.js libraries have a synchronous version and an asynchronous version. Because if this function is to be executed once in the application initialization, it is more advantageous to use the synchronous version. Because it is faster, and the fact that it is blocking does not matter in this case because at the start of the application there are no client requests yet.
 
-Existem várias formas de escrever funções assíncronas em JavaScript, apenas quatro delas serão abordadas neste trabalho, discutidas por Simpson (2015) e Casciaro e Mammino (2016): Callbacks, Promises, Async/Await, e Generators. Segundo Simpson (2015) callbacks são a maneira mais fundamental e mais usada para escrever código assíncrono em JavaScript. Define-se, simplificadamente, callbacks como funções que são passadas como parâmetro para uma outra função e executam de após a função que as contém é executada. É importante destacar que nem toda callback é assíncrona, isso depende de como a função foi escrita.
+According to Simpson (2015), asynchronous functions help to create applications that do not block for two reasons: first, because they can be divided into smaller tasks that do not need to be executed at once, other functions can be performed between these tasks; the second reason is the fact that some functions need idle time, for example to wait for data reception from another application, and this can be done while other functions run. Already in a synchronous function this time of waiting would leave the thread in idle state, that is, blocking the execution of other tasks.
 
-Simpson (2015) define Promise como um mecanismo facilmente repetível para encapsular e compor valores futuros. De maneira simplificada uma Promise retorna um estado e um valor, o estado pode ser pendente, resolvida ou recusada. Geralmente o estado inicial é pendente e não há valor, quando a tarefa realizada pela Promise é finalizada o estado muda para resolvida e o valor é o resultado dessa tarefa. Caso ocorra algum erro na execução da tarefa, o estado passa a ser recusada e o valor é o erro ocorrido. As vantagens de Promises é que podem ser encadeadas facilmente; lidar com erros é mais fácil; a forma de escrita é mais compreensível do que callbacks.
+For example, a program must perform a function that essentially does two tasks: it requests data from an external application, and then does a simple calculation with that data. The request takes 5 ms (milliseconds), and the calculation 15 ms, but the waiting time for the external application to respond to the request is 780 ms. If this function is performed synchronously (blocking) the thread will be occupied by this function for 800 ms and during that time no other function can be executed. If the function is asynchronous the program executes the request task in 5 ms, it returns the control of the thread to the event loop that can perform other functions that are in the queue and when the external application returns the data (780 ms later of the request) a callback with this data enters the execution queue, and when its time comes, it is executed.
 
-Simpson (2015) explica que para escrever uma função assíncrona utilizando Async/Await basta utilizar a palavra reservada em JavaScript async antes da declaração de uma função, e dentro dessa função a palavra reservada await pode ser utilizada para pausar assincronamente a execução da função e aguardar uma tarefa, que quando finalizada retoma a execução da função.
+There are several ways to write asynchronous functions in JavaScript, only four of them will be discussed in this paper, discussed by Simpson (2015) and Casciaro and Mammino (2016): Callbacks, Promises, Async/Await, and Generators. According to Simpson (2015) callbacks are the most fundamental and most used way to write asynchronous code in JavaScript. Callbacks are defined as functions that are passed as a parameter to another function and executed after the function containing them is executed. It is important to note that not every callback is asynchronous, it depends on how the function was written.
 
-Simpson (2015) explica que para escrever uma função assíncrona utilizando Async/Await basta utilizar a palavra reservada em JavaScript async antes da declaração de uma função, e dentro dessa função a palavra reservada await pode ser utilizada para pausar assincronamente a execução da função e aguardar uma tarefa, que quando finalizada retoma a execução da função.
+Simpson (2015) defines Promise as an easily repeatable mechanism for encapsulating and composing future values. In a simplified way a Promise returns a state and a value, the state can be pending, resolved or refused. Usually the initial state is pending and there is no value, when the task performed by Promise is finished the state changes to resolved and the value is the result of that task. If an error occurs in the execution of the task, the state is denied and the value is the error that occurred. The advantages of Promises is that they can be chained easily; dealing with mistakes is easier; the form of writing is more understandable than callbacks.
 
-O autor ainda diz que um Generator é declarado usando um asterisco (*) apoś a palavra chave function, uma função desse tipo pode ser pausada em qualquer lugar dentro de sua declaração utilizando-se a palavra reservada yield. E a execução só é retomada quando o método next() é chamado na referência desse Generator.
+Simpson (2015) explains that to write an asynchronous function using Async / Await it is enough to use the reserved word in JavaScript async before the declaration of a function, and within that function the await reserved word can be used to asynchronously pause the execution of the function and wait a task, which when completed resumes the execution of the function.
+
+The author further states that a Generator is declared using an asterisk (*) after the function keyword, a function of this type can be paused anywhere within its declaration using the reserved word yield. And execution is only resumed when the next () method is called in the reference of this Generator.
 
 
 ### 2.4 - Streams
 
 
-Teixeira (2013) define stream como uma construção abstrata que é implementada por vários objetos do Node.js. Segundo Casciaro e Mammino (2016), em uma plataforma baseada em eventos, como Node.js, a maneira mais eficiente de lidar com entrada e saída de dados (I/O) é consumir a entrada assim que estiver disponível e enviar a saída assim que estiver pronta, e é exatamente isso que streams fazem.
+Teixeira (2013) defines stream as an abstract construct that is implemented by several Node.js objects. According to Casciaro and Mammino (2016), in an event-based platform such as Node.js, the most efficient way to handle input and output (I/O) is to consume the input as soon as it is available and send the output that's ready, and that's exactly what streams do.
 
-Segundo Casciaro e Mammino (2016) algumas funções assíncronas, apesar de não bloquearem o loop de eventos, usam um buffer para armazenar os resultados das tarefas realizadas por ela e só retornam esses resultados após todas tarefas finalizarem. Existem três problemas em usar um buffer: enquanto todas tarefas dessa função não finalizarem, a próxima função que usa esse resultado não pode iniciar; o buffer ocupa espaço na memória, caso os dados sejam muito grandes (um arquivo de vídeo por exemplo) ou vários clientes estejam usando essa função com buffer, o servidor pode ocupar toda sua memória, causando uma indisponibilidade; o buffer tem um tamanho máximo, que no Node.js é aproximadamente 1 gigabyte, se os dados excederem esse valor um erro de buffer overflow ocorre.
+According to Casciaro and Mammino (2016) some asynchronous functions, although they do not block the events loop, use a buffer to store the results of the tasks performed by it and only return those results after all tasks finish. There are three problems with using a buffer: As long as all tasks in this function do not finish, the next function that uses this result can not start; the buffer takes up space in memory, if the data is too large (a video file for example) or multiple clients are using this buffered function, the server can occupy all of its memory, causing an unavailability; the buffer has a maximum size, which in Node.js is approximately 1 gigabyte, if the data exceeds this value a buffer overflow error occurs.
 
-Em Node.js streams podem ser de quatro tipos: Readable, Writeable, Duplex e Transform. Casciaro e Mammino (2016) definem uma readable stream como uma representação de uma fonte de dados, por exemplo um arquivo a ser lido. Os autores também definem uma writeable stream como uma representação de um destino de dados, como por exemplo um arquivo a ser gravado. Uma duplex stream é readable e writeable ao mesmo tempo. Já uma transform stream é um tipo especial de duplex stream, pois nela existe uma relação estabelecida entre os dados de entrada e de saída, enquanto na duplex stream essa relação não é estabelecida.
+In Node.js streams can be of four types: Readable, Writeable, Duplex and Transform. Casciaro and Mammino (2016) define a readable stream as a representation of a data source, for example a file to be read. Authors also define a writeable stream as a representation of a data destination, such as a file to be written. A duplex stream is readable and writeable at the same time. A transform stream is a special type of duplex stream, since there is an established relationship between the input and output data, whereas in the duplex stream this relation is not established.
 
-Segundo Casciaro e Mammino (2016), streams podem ser encadeadas, semelhante às promises, a diferença é que no caso das promises uma operação da cadeia deve ser finalizada para que a próxima comece, já com streams cada pedaço que passa por uma operação já é enviado e pode ser processado pela próxima operação. As Figuras 4 e 5 esclarecem essa diferença.
+According to Casciaro and Mammino (2016), streams can be chained, similar to promises, the difference is that in the case of promises a chain operation must be finalized so that the next one begins, on the other hand with streams each piece that goes through an operation is already sent and can be processed by the next operation. Figures 4 and 5 clarify this difference.
 
 
-##### Figura 4: Lendo um arquivo usando buffer
+##### Figure 4: Reading a file using buffer
 
 ![buffer](/img/4.png)
 
-*Fonte: Casciaro e Mammino (2016)*
+*Source: Casciaro e Mammino (2016)*
 
 
-##### Figura 5: Lendo um arquivo usando stream
+##### Figure 5: Reading a file using stream
 
 ![stream](/img/5.png)
 
-*Fonte: Casciaro e Mammino (2016)*
+*Source: Casciaro e Mammino (2016)*
 
 
-Observa-se no primeiro passo da Figura 4 que uma parte do arquivo é lida e armazenada no buffer da memória, no segundo passo a leitura do arquivo é finalizada e todo conteúdo contido no buffer da memória é enviado à próxima operação. Enquanto na Figura 5 nota-se que no primeiro passo, assim que parte do arquivo está na memória, já é enviada para próxima operação, e no segundo passo a outra parte do arquivo é lida e enviada para próxima operação.
+It is observed in the first step of Figure 4 that a portion of the file is read and stored in the memory buffer, in the second step the file reading is terminated and all content contained in the memory buffer is sent to the next operation. While in Figure 5 it is noted that in the first step, as soon as part of the file is in memory, it is already sent to the next operation, and in the second step the other part of the file is read and sent to the next operation.
 
-Segundo Casciaro e Mammino (2016), em alguns casos a operação seguinte pode ser mais lenta do que a leitura, o que causaria um acúmulo de dados na memória semelhante ao uso de buffer, porém streams possuem um mecanismo interno para evitar isso. Esse mecanismo cria um buffer bem pequeno, e enquanto esse buffer estiver cheio a leitura é pausada, assim que houver espaço no buffer a leitura é retomada, evitando um erro de buffer overflow.
-
-
-### 2.5 - Exemplo Prático
+According to Casciaro and Mammino (2016), in some cases the next operation may be slower than reading, which would cause a buffering of data in memory similar to buffering, but streams have an internal mechanism to prevent this. This mechanism creates a very small buffer, and while this buffer is full the reading is paused, once there is space in the buffer the reading is resumed, avoiding a buffer overflow error.
 
 
-Um exemplo prático para esclarecer as vantagens e desvantagens do uso de código síncrono, assíncrono e streams é analisado a seguir. Neste exemplo criou-se uma aplicação de linha de comando simples, que apenas lê um arquivo, o compacta, logo em seguida o descompacta e finalmente o grava. É um bom exemplo para visualizar as diferenças em performance e ordem de execução entre código síncrono, assíncrono e streams.
+### 2.5 - Practical Example
 
 
-##### Figura 6: Arquivo zipSync.js
+A practical example to clarify the advantages and disadvantages of using synchronous, asynchronous, and streams code is discussed below. In this example we created a simple command line application, which just reads a file, then compacts it, then unpacks it and finally saves it. It is a good example to visualize the differences in performance and order of execution between synchronous, asynchronous code and streams.
+
+
+##### Figure 6: zipSync.js file
 
 ![zipSync](/img/6.png)
 
-*Fonte: Autoria própria*
+*Source: Own authorship*
 
 
-##### Figura 7: Arquivo zipAsync.js
+##### Figure 7: zipAsync.js file
 
 ![zipAsync](/img/7.png)
 
-*Fonte: Autoria própria*
+*Source: Own authorship*
 
 
-##### Figura 8: Arquivo zipStream.js
+##### Figure 8: zipStream.js file
 
 ![zipStream](/img/8.png)
 
-*Fonte: Autoria própria*
+*Source: Own authorship*
 
 
-Nas Figuras 6, 7 e 8 tem-se respectivamente o código fonte da nossa aplicação de três formas diferentes: síncrona, assíncrona com buffer e por último também assíncrona, porém utilizando streams. Explica-se agora os códigos fonte, linha por linha.
+In Figures 6, 7 and 8 we have the source code of our application in three different ways: synchronous, asynchronous with buffer and finally asynchronous, but using streams. The source codes, line by line, are now explained.
 
-As linhas de 1 a 5 são iguais nas três figuras. Nas linhas 1 e 2 carregam-se duas bibliotecas do Node.js que possuem funções para lidar com o sistema de arquivos e compactar arquivos respectivamente. Na linha 3 define-se uma variável que recebe o caminho do arquivo a ser lido. Na linha 4 carrega-se uma biblioteca, mostrada no apêndice A, que apenas serve para cronometrar o tempo de execução da aplicação. E na linha 5 inicia-se a contagem do tempo. Também em comum nas três figuras é a última linha que imprime no terminal a string “Outras Tarefas”. Isso serve para visualizar quando seriam executadas possíveis outras tarefas na aplicação, antes ou depois das operações no arquivo serem finalizadas.
+Lines 1 through 5 are the same in all three figures. In lines 1 and 2 are loaded two libraries of Node.js that have functions to handle the file system and compact files respectively. In line 3 a variable is defined that receives the path of the file to be read. In line 4 a library is loaded, shown in appendix A, which is only used to time the application execution time. And in line 5 the time counting starts. Also in common in the three figures is the last line that prints in the terminal the string "Other Tasks". This is to visualize when other possible tasks in the application would be executed, before or after the operations in the file are finished.
 
-Entre a quinta e a última linha dos códigos fontes, são executadas funções para ler, compactar, descompactar e gravar o arquivo, nesta ordem. Todas essas funções fazem parte das bibliotecas nativas do Node.js: fs e zlib. A diferença é que na Figura 6 as funções usadas são síncronas, na Figura 7 as funções são assíncronas com buffer, e na Figura 8 as funções são assíncronas com streams.
+Between the fifth and last line of source codes, functions are performed to read, compress, unpack, and save the file, in that order. All of these functions are part of the native Node.js libraries: fs and zlib. The difference is that in Figure 6 the functions used are synchronous, in Figure 7 the functions are asynchronous with buffer, and in Figure 8 the functions are asynchronous with streams.
 
-Observa-se agora, na Figura 9, o resultado da execução das três implementações de nossa aplicação utilizando o mesmo arquivo (de 346MB) como entrada.
-
-
-##### Figura 9: Execução das três implementações da aplicação
-
-![execução das aplicações](/img/9.png)
-
-*Fonte: Autoria própria*
+The result of running the three implementations of our application using the same file (of 346MB) as input is now shown in Figure 9.
 
 
-Nas três primeiras linhas observa-se o resultado da aplicação com funções síncronas, o mais importante a ser notado aqui é o fato da string “Outras Tarefas” aparecer após a finalização do cronômetro, isso significa que outras tarefas seriam bloqueadas e só executariam após o término das operações feitas no arquivo. Observa-se também que a aplicação síncrona é a mais rápida de todas como é de se esperar já que as operações no arquivo não pausam.
+##### Figure 9: Running the three implementations of the application
 
-Da quarta linha até a sexta, tem-se a execução da aplicação assíncrona em buffer. Nota-se que ela é a mais lenta de todas, leva cerca de 20% a mais de tempo em relação a aplicação síncrona. Porém o destaque é o fato da string “Outras Tarefas” aparecer antes da finalização do cronômetro, ou seja, caso existam outras tarefas estas não precisam aguardar as operações no arquivo finalizarem para executar, o que é de acordo com a filosofia de não bloquear o loop de eventos.
+![running the applications](/img/9.png)
 
-Da sétima linha à nona linha, exibe-se o resultado da aplicação assíncrona utilizando streams. Assim como a aplicação assíncrona com buffer, as “Outras Tarefas” são executadas antes das operações no arquivo finalizarem. E também se observa que o tempo de execução é menor em relação a implementação com buffer, isso deve-se ao fato de que o encadeamento de streams permite que por exemplo a operação de compactar inicie assim que uma pequena parte da operação de leitura está pronta.
-
-Conclui-se então que é melhor optar por código síncrono quando o bloqueio não é um problema, por exemplo na inicialização de um servidor pois o código executa apenas uma vez e ainda não entrou no loop de eventos. Já para operações dentro do loop de eventos é melhor optar pela opção assíncrona com streams, quando possível, principalmente para lidar com arquivos grandes, pois além de ser mais rápida, é mais leve em relação a memória como já foi visto anteriormente.
+*Source: Own authorship*
 
 
-[Voltar ao Sumário](#Sumário)
+The first three lines show the result of the application with synchronous functions, the most important thing to note here is the fact that the string "Other Tasks" appears after the stopwatch finishes, that means that other tasks would be blocked and would only execute after the operations of the file. It is also observed that the synchronous application is the fastest of all as it is expected since the operations in the file do not pause.
+
+From the fourth line to the sixth, we have the execution of the asynchronous application in buffer. Note that it is the slowest of all, it takes about 20% more time than the synchronous application. However, the highlight is the fact that the "Other Tasks" string appears before the timer finishes, that is, if there are other tasks, they do not have to wait for the operations in the file to finish to execute, which is according to the philosophy of not blocking the event loop.
+
+From the seventh line to the ninth line, the result of the asynchronous application using streams is displayed. Like the asynchronous buffered application, "Other Tasks" are executed before operations on the file are finished. And it is also observed that the execution time is smaller in relation to the implementation with buffer, this is due to the fact that the thread chaining allows for example the compacting operation to start as soon as a small part of the read operation is ready.
+
+It is concluded that it is better to opt for synchronous code when blocking is not a problem, for example when starting a server because the code only executes once and has not yet entered the event loop. Already for operations inside the event loop it is better to opt for the asynchronous option with streams, when possible, mainly to handle large files, because besides being faster, it is lighter in relation to the memory as already seen previously.
+
+
+[Back to Summary](#Summary)
 
 
 ## 3 - Bibliotecas
@@ -590,7 +588,7 @@ Uma biblioteca para validação de dados é a Validator.js. Ela conta com mais d
 Conclui-se que é muito importante validar e sanear dados. Pois ataques de injeção de código podem causar diversos tipos de dano, inclusive negação de serviço. Também se mostrou que existem diversas bibliotecas especialmente desenvolvidas para validação e saneamento de dados. O uso delas pode significar a proteção de sua aplicação contra a maior parte dos ataques realizados na web.
 
 
-[Voltar ao Sumário](#Sumário)
+[Back to Summary](#Summary)
 
 
 ## 4 - Expressões Regulares
@@ -685,7 +683,7 @@ Observa-se na tabela 1 que o tempo de resposta da aplicação aproximadamente do
 Goldberg et al (2019), recomendam usar, quando possível, uma biblioteca de validação, como por exemplo a validator.js já citada na seção 4.4. Quando for necessário usar uma expressão regular recomendam o uso da biblioteca safe-regex, que detecta expressões regulares potencialmente vulneráveis a ataques de negação de serviço. Os autores ainda recomendam validar o tamanho máximo da entrada antes de realizar qualquer operação com a mesma (incluindo testes com regex). Pois assim evita-se que, caso haja uma vulnerabilidade, o atacante não tenha o poder de usar uma entrada muito grande, minimizando os danos.
 
 
-[Voltar ao Sumário](#Sumário)
+[Back to Summary](#Summary)
 
 
 ## 5 - Boas Práticas
@@ -713,7 +711,7 @@ vulnerável.
 Düüna (2016) destaca algumas boas práticas para se evitar ataques de negação de serviço através de funções assimétricas. Funções assimétricas são aquelas cujo tempo de execução dependem do tamanho da entrada do usuário. A primeira recomendação do autor é evitar funções assimétricas quando possível. Mas algumas vezes não existe uma maneira de evitá-las, então o autor recomenda limitar o tamanho da entrada, como foi visto no parágrafo anterior. Düüna (2016) ainda recomenda que apenas usuários autenticados possam usar de funções assimétricas, diminuindo a possibilidade de ataques de negação de serviço.
 
 
-[Voltar ao Sumário](#Sumário)
+[Back to Summary](#Summary)
 
 
 ## Considerações Finais
@@ -736,6 +734,7 @@ Também se observou algumas boas práticas em Node.js que ajudam a mitigar vulne
 Conclui-se assim que muitas vulnerabilidades de negação de serviço podem ser evitadas tomando-se medidas mostradas neste trabalho. No ambiente de segurança da informação, novas tecnologias e técnicas surgem a todo momento, tanto para ajudar na segurança quanto para tentar quebrá-la. Portanto é importante também manter-se sempre atualizado sobre novos tipos de vulnerabilidades, ameaças e como combatê-las, para que suas aplicações estejam sempre protegidas da melhor maneira possível.
 
 
+[Back to Summary](#Summary)
 
 
 ## Referências Bibliográficas
@@ -820,7 +819,7 @@ VALIDATOR.JS. Biblioteca para aplicações Node.js que valida dados, 2019. Dispo
 WHITMAN, Michael E.; MATTORD, Hebert J. Principles of Information Security. 4. ed. Boston: Course Technology, 2011.
 
 
-[Voltar ao Sumário](#Sumário)
+[Back to Summary](#Summary)
 
 
 ## Apêndice A
@@ -838,4 +837,4 @@ Biblioteca crono.js, utilizada para cronometrar o tempo de execução nos exempl
 
 
 
-[Voltar ao Sumário](#Sumário)
+[Back to Summary](#Summary)
