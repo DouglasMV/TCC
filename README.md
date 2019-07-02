@@ -328,8 +328,6 @@ Simpson (2015) define Promise como um mecanismo facilmente repetível para encap
 
 Simpson (2015) explica que para escrever uma função assíncrona utilizando Async/Await basta utilizar a palavra reservada em JavaScript async antes da declaração de uma função, e dentro dessa função a palavra reservada await pode ser utilizada para pausar assincronamente a execução da função e aguardar uma tarefa, que quando finalizada retoma a execução da função.
 
-Simpson (2015) explica que para escrever uma função assíncrona utilizando Async/Await basta utilizar a palavra reservada em JavaScript async antes da declaração de uma função, e dentro dessa função a palavra reservada await pode ser utilizada para pausar assincronamente a execução da função e aguardar uma tarefa, que quando finalizada retoma a execução da função.
-
 O autor ainda diz que um Generator é declarado usando um asterisco (*) apoś a palavra chave function, uma função desse tipo pode ser pausada em qualquer lugar dentro de sua declaração utilizando-se a palavra reservada yield. E a execução só é retomada quando o método next() é chamado na referência desse Generator.
 
 
