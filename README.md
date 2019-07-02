@@ -731,6 +731,7 @@ Também se observou algumas boas práticas em Node.js que ajudam a mitigar vulne
 Conclui-se assim que muitas vulnerabilidades de negação de serviço podem ser evitadas tomando-se medidas mostradas neste trabalho. No ambiente de segurança da informação, novas tecnologias e técnicas surgem a todo momento, tanto para ajudar na segurança quanto para tentar quebrá-la. Portanto é importante também manter-se sempre atualizado sobre novos tipos de vulnerabilidades, ameaças e como combatê-las, para que suas aplicações estejam sempre protegidas da melhor maneira possível.
 
 
+[Voltar ao Sumário](#Sumário)
 
 
 ## Referências Bibliográficas
