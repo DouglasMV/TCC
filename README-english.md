@@ -420,172 +420,172 @@ It is concluded that it is better to opt for synchronous code when blocking is n
 [Back to Summary](#Summary)
 
 
-## 3 - Bibliotecas
+## 3 - Libraries
 
 
-Mueller (2016) define uma biblioteca como qualquer código externo que é adicionada a sua aplicação. O autor ainda afirma que bibliotecas são puramente códigos que são baixados e executados como parte de uma aplicação. É possível usar funções diretamente, algumas vezes o código fonte está disponível para se mudar o comportamento dessas funções.
+Mueller (2016) defines a library as any external code that is added to your application. The author further states that libraries are purely codes that are downloaded and executed as part of an application. You can use functions directly, sometimes the source code is available to change the behavior of these functions.
 
-Casciaro e Mammino (2016) definem um módulo como um meio fundamental para estruturar o código de um programa. É um bloco de construção para criar aplicações e bibliotecas reusáveis chamadas de pacotes. Os autores ainda destacam que um dos princípios do Node.js é criar módulos pequenos, pois são mais fáceis de entender e reusar, simples de testar e perfeitos para compartilhar com o navegador. O termo pacote é usado para se referir a um módulo ou biblioteca de código.
+Casciaro and Mammino (2016) define a module as a fundamental means to structure the code of a program. It is a building block for creating applications and reusable libraries called packages. The authors also point out that one of the principles of Node.js is to create small modules as they are easier to understand and reuse, simple to test and perfect for sharing with the browser. The term package is used to refer to a module or code library.
 
-Casciaro e Mammino (2016) definem um módulo como um meio fundamental para estruturar o código de um programa. É um bloco de construção para criar aplicações e bibliotecas reusáveis chamadas de pacotes. Os autores ainda destacam que um dos princípios do Node.js é criar módulos pequenos, pois são mais fáceis de entender e reusar, simples de testar e perfeitos para compartilhar com o navegador. O termo pacote é usado para se referir a um módulo ou biblioteca de código.
+The Node Package Manager (NPM) is the package manager used by Node.js. It was bundled to Node.js early in the development process, and according to Düüna (2016) was a good decision because NPM is one of the reasons for Node.js success. NPM makes it easy to install, publish, and manage package dependencies. There are some commands and scripts that facilitate and accelerate the application development process.
 
-Dahl (2018) diz que um de seus maiores arrependimentos quanto a criação do Node.js é a falta de atenção à segurança. Um exemplo que ele cita é o fato de bibliotecas terem acesso ao computador e a rede de seu servidor ou computador que está executando a aplicação. Esse é um dos motivos pelo qual recomenda-se executar aplicações em um sandbox, e nunca como root ou administrador.
+Dahl (2018) says one of his biggest regrets about creating Node.js is the lack of attention to security. An example he cites is that libraries have access to the computer and the network of their server or computer running the application. This is one of the reasons why it is recommended to run applications in a sandbox, never as root or administrator.
 
-Düüna (2016) alerta que para usar bibliotecas de terceiros é preciso ter confiança. Isso significa ter certeza que as bibliotecas foram escritas por pessoas bem-intencionadas, não pessoas que querem causar danos e prejuízos. Além disso é preciso confiar que as bibliotecas e suas dependências não possuem erros ou vulnerabilidades conhecidas. O autor mostra que um projeto pode conter dezenas e até centenas de bibliotecas e dependências, o que faz a checagem manual das mesmas impossível. Afinal a ideia é usar bibliotecas para ganhar tempo, e não gastar tempo procurando vulnerabilidades.
+Düüna (2016) warns that to use third-party libraries one must have confidence. That means making sure the libraries were written by well-intentioned people, not people who want to cause harm and loss. In addition, you must trust that libraries and their dependencies have no known bugs or vulnerabilities. The author shows that a project can contain dozens and even hundreds of libraries and dependencies, which makes manual checking impossible. After all the idea is to use libraries to save time, and not spend time looking for vulnerabilities.
 
-Segundo Düüna (2016) existem três opções para lidar com uma escolha de pacotes: escolher pacotes populares; obscurecer pacotes; e escrever seu próprio código. A primeira opção baseia-se no fato de que quanto mais pessoas usam um pacote maior a comunidade por trás do mesmo. O que implica em um maior número de pessoas procurando vulnerabilidades e atualizando o pacote para remover as mesmas. Assim as vulnerabilidades mais óbvias muito provavelmente já foram encontradas e removidas. Além disso é comum pacotes populares terem uma ou mais empresas grandes por trás, seja desenvolvendo ou patrocinando, e geralmente elas também cedem recursos para melhorar a segurança do pacote. Porém o autor alerta que um maior número de usuários também significa uma atração maior para hackers mal-intencionados.
+According to Düüna (2016) there are three options for dealing with a choice of packages: choosing popular packages; obscure packets; and write your own code. The first option is based on the fact that the more people use a package the lager is the community behind it. This implies that more people are looking for vulnerabilities and updating the package to remove them. So the most obvious vulnerabilities have most likely already been found and removed. In addition, it is common for popular packages to have one or more large companies behind, either developing or sponsoring, and generally they also provide features to improve package security. But the author warns that a greater number of users also means a greater attraction for malicious hackers.
 
-A segunda opção discutida por Düüna (2016) é obscurecer pacotes. Isso significa expor o mínimo possível de sua aplicação, como por exemplo quais pacotes ela usa. A última opção descrita pelo autor é escrever o próprio código. Essa geralmente é a opção mais demorada e cara. Além disso o autor lembra que todos estão suscetíveis ao erro, e em uma biblioteca de terceiros é possível que o próprio desenvolvedor ou alguém que usou a biblioteca tenha encontrado e removido vulnerabilidades.
+The second option discussed by Düüna (2016) is to obscure packages. This means exposing as little of your application as possible, such as which packages it uses. The last option described by the author is to write the code itself. This is usually the most time-consuming and expensive option. In addition, the author recalls that everyone is susceptible to error, and in a third-party library it is possible that the developer or someone who used the library has found and removed vulnerabilities.
 
-Um exemplo de pacote muito popular é o Express (https://expressjs.com), que fornece uma série de recursos para criação de aplicações web. É um projeto de código aberto criado em junho de 2009, e conta com mais de duzentos contribuidores diretos. Como é um dos pacotes mais antigos e mais populares, a chance de uma vulnerabilidade ter passado despercebida é muito pequena.
+An example of a very popular package is Express (https://expressjs.com), which provides a number of features for creating web applications. It is an open source project created in June 2009, and has more than two hundred direct contributors. Because it is one of the oldest and most popular packages, the chance that a vulnerability has gone unnoticed is very small.
 
-Düüna (2016) diz que após a escolha dos pacotes é preciso verificar, auditar e testar os mesmos em relação a segurança. Primeiramente o autor aconselha a observar as funcionalidades do pacote que são usadas na aplicação. Se a maioria delas não for utilizada, talvez o pacote escolhido não seja o ideal. Pacotes inchados podem complicar o código da aplicação e criar dependências desnecessárias.
+Düüna (2016) says that after choosing packages it is necessary to verify, audit and test them for safety. First, the author advises observing the package features that are used in the application. If most of them are not used, perhaps the package chosen is not ideal. Puffy packages can complicate application code and create unnecessary dependencies.
 
-O autor também recomenda que se verifique o caminho percorrido pelos dados dentro do pacote. Verificar se não são manipulados de forma insegura ou maliciosa. Se os dados se originam de entradas do usuário é preciso verificar se eles estão de acordo com os padrões: não usam a função eval ou semelhantes (vulneráveis a injeção de códigos); as funções não devem ser invocadas antes da validação dos dados; devem existir limites para os valores.
+The author also recommends checking the path traveled by the data within the packet. Make sure they are not handled in an insecure or malicious way. If the data originates from user inputs, it is necessary to check if they conform to the standards: do not use the eval function or similar (vulnerable to code injection); the functions should not be invoked before data validation; there must be limits on values.
 
-Düüna (2016) destaca que é comum códigos maliciosos serem inseridos em scripts dentro do arquivo package.json ou de funções temporais, principalmente setInterval. Pois assim esses códigos maliciosos são executados pelos scripts ou de tempo em tempo. O autor também recomenda verificar se os pacotes usam os módulos nativos de Node.js (http, fs, net, tls, child_process, cluster, udp, vm, entre outros), pois esses módulos são usados para acessar funções do sistema operacional, sistema de arquivos, rede e outros. Por isso também é importante não executar pacotes de terceiros em contas root ou administrador.
+Düüna (2016) points out that it is common for malicious code to be inserted into scripts within the package.json file or for temporal functions, mainly setInterval. Well, these malicious code is executed by scripts or from time to time. The author also recommends checking if the packages use the native modules of Node.js (http, fs, net, tls, child_process, cluster, udp, vm, among others), since these modules are used to access system operating system functions of files, network and others. Therefore, it is also important not to run third-party packages on root or administrator accounts.
 
-Outra boa prática relatada por Düüna (2016) é manter os pacotes atualizados, pois assim vulnerabilidades recém encontradas podem ser removidas. O autor destaca ainda que é preciso testar as atualizações antes de usá-las em produção, pois elas podem criar bugs inesperados na aplicação. Dois sites que mantém bases de vulnerabilidades de pacotes são: npmjs.com/advisories e snyk.io/vuln. Um site muto bom para procurar pacotes é o npms.io que avalia os pacotes em relação à popularidade, manutenção e qualidade. 
+Another good practice reported by Düüna (2016) is to keep the packages up to date so that newly discovered vulnerabilities can be removed. The author also emphasizes that you have to test the updates before using them in production, as they can create unexpected bugs in the application. Two sites that maintain packet vulnerability bases are: npmjs.com/advisories and snyk.io/vuln. A very good site to look for packages is npms.io that evaluates packages in relation to popularity, maintenance and quality.
 
-É claro que entrar nos sites acima citados e checar um por um dos pacotes usados em sua aplicação, e todas dependências deles, consumiria muito tempo. Por isso existem ferramentas para realizar essa checagem de forma rápida. O NPM conta com uma ferramenta padrão que verifica os pacotes vulneráveis, basta digitar o comando npm audit em um terminal aberto na pasta que contém seu projeto. As Figuras 10 e 11 mostram respectivamente o resultado desse comando em uma aplicação que possui um pacote com vulnerabilidades conhecidas, e em uma aplicação livre de pacotes com vulnerabilidades conhecidas.
-
-
-##### Figura 10: Comando npm audit em uma aplicação com vulnerabilidades conhecidas
-
-![npm audit com vulnerabilidade](/img/10.png)
-
-*Fonte: Autoria própria*
+Of course joining the sites mentioned above and checking one by one of the packages used in your application, and all dependencies of them, would take a lot of time. So there are tools to perform this check quickly. NPM has a standard tool that scans vulnerable packages by simply typing the npm audit command into an open terminal in the folder that contains your project. Figures 10 and 11 respectively show the result of this command in an application having a known vulnerability packet and in a packet-free application with known vulnerabilities.
 
 
-##### Figura 11: Comando npm audit em uma aplicação sem vulnerabilidades conhecidas
+##### Figure 10: npm audit command in an application with known vulnerabilities
 
-![npm audit sem vulnerabilidade](/img/11.png)
+![npm audit with vulnerabilities](/img/10.png)
 
-*Fonte: Autoria própria*
-
-
-Na Figura 10 uma vulnerabilidade foi encontrada, o comando npm audit informa o nível da vulnerabilidade como moderado. Também mostra qual o tipo da vulnerabilidade, nesse caso Denial of Service, negação de serviço. Além disso informa qual pacote possui a vulnerabilidade, de qual outro pacote ele é dependência, o caminho para o pacote vulnerável, e fornece um endereço para maiores informações. Também se mostra a vulnerabilidade já foi removida em alguma versão do pacote, nesse caso ainda não há um patch disponível.
-
-A Snyk, empresa focada em encontrar e solucionar vulnerabilidades em pacotes, também possui uma ferramenta para encontrar pacotes vulneráveis em sua aplicação. Primeiro é preciso instalar a ferramenta usando npm install -g snyk. É necessário estar autenticado no site da Snyk para utilizar essa ferramenta. Depois utiliza-se o comando snyk test para procurar vulnerabilidades. E também é possível usar o comando snyk monitor, que monitora as dependências de sua aplicação e te notifica por e-mail caso novas vulnerabilidades sejam encontradas em algum pacote usado por sua aplicação. As Figuras 12 e 13 mostram, respectivamente, exemplos desses comandos em uma aplicação com vulnerabilidades conhecidas, e uma aplicação sem vulnerabilidades conhecidas.
+*Source: Own authorship*
 
 
-##### Figura 12: Comando snyk test em uma aplicação com vulnerabilidades conhecidas
+##### Figure 11: npm audit command in an application without known vulnerabilities
 
-![snyk test com vulnerabilidade](/img/12.png)
+![npm audit without vulnerabilities](/img/11.png)
 
-*Fonte: Autoria própria*
-
-
-##### Figura 13: Comandos snyk test e snyk monitor em aplicação sem vulnerabilidades conhecidas
-
-![snyk test sem vulnerabilidade](/img/13.png)
-
-*Fonte: Autoria própria*
+*Source: Own authorship*
 
 
-A ferramenta snyk mostra algumas informações diferentes em relação ao comando npm audit. O principal diferencial é a capacidade de monitorar as vulnerabilidades com o comando snyk monitor e receber atualizações por e-mail.
+In Figure 10 a vulnerability was encountered, the npm audit command reports the vulnerability level as moderate. It also shows what kind of vulnerability, in this case Denial of Service. It also informs which package has the vulnerability, which other package it is dependency on, the path to the vulnerable package, and provides an address for more information. It also shows that the vulnerability has already been removed in some version of the package, in which case there is no patch available yet.
 
-Como já foi citado, Düüna (2016) recomenda o uso de pacotes de terceiros pois a chance de vulnerabilidades passarem despercebidas por eles é menor do que se o desenvolvedor escrever o próprio código. Isso é mais relevante ainda quando se fala de pacotes que resolvem problemas mais complicados relacionados a segurança, como por exemplo criptografar senhas. Por isso é importante conhecer alguns pacotes úteis relacionados a segurança. Serão explorados a seguir neste capítulo alguns desses pacotes, principalmente relacionados a negação de serviço.
+Snyk, a company focused on finding and resolving packet vulnerabilities, also has a tool for finding vulnerable packages in your application. First you need to install the tool using npm install -g snyk. You must be logged in to Snyk's website to use this tool. Then use the snyk test command to look for vulnerabilities. And you can also use the snyk monitor command, which monitors the dependencies of your application and notifies you via e-mail if new vulnerabilities are found in any package used by your application. Figures 12 and 13 respectively show examples of such commands in an application with known vulnerabilities, and an application without known vulnerabilities.
+
+
+##### Figure 12: snyk test command in an application with known vulnerabilities
+
+![snyk test with vulnerabilities](/img/12.png)
+
+*Source: Own authorship*
+
+
+##### Figure 13: snyk test and snyk monitor commands in application without known vulnerabilities
+
+![snyk test without vulnerabilities](/img/13.png)
+
+*Source: Own authorship*
+
+
+The snyk tool shows some different information regarding the npm audit command. The main differential is the ability to monitor vulnerabilities with the snyk monitor command and receive updates via email.
+
+As already mentioned, Düüna (2016) recommends using third-party packages because the chance of vulnerabilities going unnoticed by them is lower than if the developer wrote the code itself. This is even more relevant when it comes to packages that solve more complicated security-related issues, such as encrypting passwords. That's why it's important to know some useful security-related packages. Some of these packages, mainly related to denial of service, will be explored later in this chapter.
 
 
 ### 3.1 - Express-rate-limit
 
 
-Segundo sua documentação (https://github.com/nfriedly/express-rate-limit), o Express-Rate-Limit é uma biblioteca para aplicações Node.js/Express usada para limitar requisições repetidas a uma aplicação. Isso é muito útil contra ataques de negação de serviço distribuídos (DDoS), pois limita a quantidade de recursos que cada máquina atacante consome.
+According to its documentation (https://github.com/nfriedly/express-rate-limit), Express-Rate-Limit is a library for Node.js/Express applications used to limit repeated requests to an application. This is very useful against distributed denial of service (DDoS) attacks because it limits the amount of resources that each attacking machine consumes.
 
-É claro que é possível limitar requisições através de outros recursos, um firewall por exemplo. Porém existem algumas vantagens em limitar requisições no próprio código de sua aplicação. Uma delas discute-se no próximo parágrafo: capacidade de configurar um limite diferente para cada rota da aplicação. Outra vantagem é que muitas vezes a aplicação é hospedada em um serviço terceirizado, e não há garantia de que esse serviço configure seu firewall de maneira adequada. E ainda que a aplicação seja hospedada na própria organização, pode acontecer de alguma configuração do firewall falhar ou ser corrompida. Portanto é melhor ter limitação redundante do que contar apenas com um recurso.
+Of course, it is possible to limit requests through other features, such as a firewall. But there are some advantages to limiting requests in the code of your application itself. One of these is discussed in the next paragraph: Ability to set a different threshold for each route of the application. Another advantage is that the application is often hosted on a third-party service, and there is no guarantee that this service will configure your firewall properly. And even if the application is hosted in the organization itself, some firewall configuration may fail or be corrupted. So it is better to have redundant limitation than to rely on only one feature.
 
-A documentação do Express-Rate-Limit mostra também que é possível configurar a quantidade máxima de requisições em um determinado tempo, também configurável. Ele também permite configurar um limite para aplicação toda, ou separadamente para cada rota da aplicação. Assim é possível limitar as requisições de acordo com o recurso. Por exemplo para uma página de login talvez seja interessante limitar 5 requisições a cada 15 minutos, para evitar ataques de força bruta contra as senhas dos usuários. Já para uma página de pesquisa por exemplo, pode ser viável configurar 20 requisições a cada 5 minutos. Esse recurso fornece uma flexibilidade para o desenvolvedor que não é possível com um firewall por exemplo.
+The Express-Rate-Limit documentation also shows that you can configure the maximum number of requests at a given time, also configurable. It also allows you to set a limit for the entire application, or separately for each application route. It is thus possible to limit the requests according to the resource. For example for a login page it might be worth limiting 5 requests every 15 minutes to prevent brute-force attacks against users' passwords. On the other hand for a search page for example, it may be feasible to set up 20 requests every 5 minutes. This feature provides developer flexibility that is not possible with a firewall for example.
 
-Na Figura 14 observa-se um exemplo de uso da biblioteca express-rate-limit aplicando regras diferentes para rotas diferentes. Para a rota /api tem-se um limite de 100 requisições a cada 15 minutos. Já para rota /create-account tem-se um limite de cinco requisições por hora. Como é possível perceber, existem algumas opções passadas à função rateLimit. A seguir destacam-se algumas opções e suas descrições segundo a documentação oficial da própria biblioteca:
+Figure 14 shows an example of using the express-rate-limit library applying different rules for different routes. For the route/api there is a limit of 100 requests every 15 minutes. For route/create-account there is a limit of five requests per hour. As you can see, there are some options passed to the rateLimit function. The following are some options and their descriptions according to the official documentation of the library itself:
 
-windowMs: quanto tempo em milisegundos deve-se manter o registro das requisições.
+windowMs: how long in milliseconds should keep the record of the requisitions.
 
-max: número máximo de requisições antes de enviar uma resposta de erro 429.
+max: maximum number of requests before sending a 429 error response.
 
-message: mensagem de erro enviada ao usuário após max ser atingido. O padrão é “Too many requests, please try again later”.
+message: error message sent to the user after max is reached. The default is "Too many requests, please try again later".
 
-statusCode: código de estado HTTP retornado após max ser excedido, por padrão é o código 429.
+statusCode: HTTP status code returned after max is exceeded, by default is code 429.
 
 
-##### Figura 14: Exemplo de uso da biblioteca express-rate-limit
+##### Figure 14: Example of using the express-rate-limit library
 
 ![express-rate-limit](/img/14.png)
 
-*Fonte: Disponível em: <https://github.com/nfriedly/express-rate-limit>. Acesso em: 03 mar. 2019*
+*Source: Available at: <https://github.com/nfriedly/express-rate-limit>. Accessed on: 03 Mar. 2019*
 
 
-Existem outras opções não destacadas neste trabalho. É possível encontrá-las na documentação da própria biblioteca. Como foi mostrado o express-rate-limit é um pacote muito útil para segurança em relação a ataques de negação de serviço. O seu uso é recomendado, porém para alguns tipos de aplicação podem existir pacotes mais apropriados. Na própria documentação do pacote são discutidos estes casos, por isso recomenda-se checar qual o melhor pacote para sua aplicação.
+There are other options not highlighted in this paper. You can find them in the library's own documentation. As shown, express-rate-limit is a very useful package for security against denial of service attacks. Its use is recommended, however for some types of application there may be more appropriate packages. These cases are discussed in the package documentation itself, so it is recommended to check the best package for your application.
 
 
 ### 3.2 - PM2
 
 
-Segundo sua própria documentação, PM2 Runtime é um gerenciador de processos em produção para aplicações Node.js, com um balanceador de carga embutido. Permite que as aplicações executem o tempo todo, reiniciá-las sem tempo de inatividade, e facilita algumas operações de desenvolvimento comuns.
+According to its own documentation, PM2 Runtime is a production process manager for Node.js applications, with a built-in load balancer. It allows applications to run all the time, restart them without downtime, and facilitate some common development operations.
 
-O PM2 Runtime é gratuito e de código aberto. Existem outras duas versões do PM2 pagas: PM2 Plus e PM2 Enterprise. Essas versões pagas contam com mais funcionalidades e com suporte online.
+The PM2 Runtime is free and open source. There are two other paid versions of the PM2: PM2 Plus and PM2 Enterprise. These paid versions have more features and support online.
 
-Para instalar o PM2 Runtime basta usar o comando npm install -g pm2. Para iniciar uma aplicação em modo de produção basta usar o comando: pm2 start app.js. Sendo app.js o ponto de entrada de sua aplicação. Com esse comando o PM2 já mantém sua aplicação executando o tempo todo, reiniciando automaticamente em caso de crash, sem tempo de inatividade. E para que a aplicação reinicie automaticamente no caso da máquina em que a aplicação reside reiniciar, basta usar o comando: pm2 startup. Para gerenciar os processos da aplicação o PM2 cria uma lista de processos, que pode ser acessada com o comando pm2 ls, como mostra a Figura 15.
+To install the PM2 Runtime simply use the npm install -g pm2 command. To start an application in production mode just use the command: pm2 start app.js. Being app.js is the entry point to your application. With this command PM2 already keeps your application running all the time, restarting automatically in case of crash, with no downtime. And for the application to restart automatically in the case of the machine where the application resides restart, just use the command: pm2 startup. To manage the application processes PM2 creates a list of processes, which can be accessed with the command pm2 ls, as shown in Figure 15.
 
 
-##### Figura 15: Lista de processos iniciados com o comando pm2 start
+##### Figure 15: List of processes started with the pm2 start command
 
 ![pm2](/img/15.png)
 
-*Fonte: Disponível em: <https://pm2.io/doc/en/runtime/overview/>. Acesso em: 03 mar. 2019*
+*Source: Available at: <https://pm2.io/doc/en/runtime/overview/>. Accessed on: 03 Mar. 2019*
 
 
-Para adicionar processos a essa lista, basta usar o comando pm2 start, como já foi escrito anteriormente. Para remover processos usa-se o comando pm2 delete `nome do app`. Existem ainda outros comandos para gerenciar os processos, como por exemplo: pm2 stop; pm2 reload; pm2 restart.
+To add processes to this list, simply use the command pm2 start, as it was written previously. To remove processes, use the command pm2 delete `app name`. There are also other commands to manage the processes, such as: pm2 stop; pm2 reload; pm2 restart.
 
-Também é possível gerar arquivos de log facilmente com o PM2. Basta usar o comando pm2 logs `nome do app` para gerar logs de um processo, ou usa-se o comando pm2 logs all, para gerar logs de todos processos. Os arquivos de log são salvos na pasta ~/.pm2/logs. Existem várias opções para gerenciar logs, por exemplo: criar vários arquivos e não apenas um muito grande; apagar os arquivos de log; escolher o formato do arquivo.
+It is also possible to generate log files easily with PM2. Just use the pm2 logs `app name` to generate logs of a process, or use the pm2 logs all command to generate logs of all processes. The log files are saved in the ~/.pm2/logs folder. There are several options for managing logs, for example: creating multiple files and not just a very large one; delete the log files; choose the file format.
 
-Uma funcionalidade muito útil do PM2, principalmente para reduzir chances de negação de serviço, é o modo cluster. Nesse modo o PM2 cria vários processos filhos da sua aplicação e balanceia a carga entre eles. Isso aumenta a performance e reduz tempo de inatividade. Para usar essa função basta iniciar a aplicação com o comando: pm2 start app.js -i max. Sendo app.js o ponto de entrada da aplicação, e -i é a opção que controla o número de instâncias. Neste caso max significa que o PM2 detecta automaticamente o número de CPUs (Central Processing Unit) disponíveis e executa quantos processos forem possíveis. Também é possível usar um número específico no lugar de max. Nesse caso o número de instâncias será o menor entre: o número digitado na opção; e o número de CPUs disponíveis.
+A very useful feature of PM2, mainly to reduce chances of denial of service, is cluster mode. In this mode PM2 creates several child processes of your application and balances the load between them. This increases performance and reduces downtime. To use this function just start the application with the command: pm2 start app.js -i max. Being app.js is the application entry point, and -i is the option that controls the number of instances. In this case max means PM2 automatically detects the number of CPUs available and executes as many processes as possible. You can also use a specific number instead of max. In this case the number of instances will be the smaller of: the number entered in the option; and the number of CPUs available.
 
-Outra função interessante do PM2 é o monitoramento direto no terminal. Basta digitar o comando pm2 monit em um terminal. Essa tela mostra consumo de CPU e memória, logs de requisições, número de requisições por minuto, delay do loop de eventos, quantas vezes o servidor foi reiniciado, o tempo de atividade, entre outros. Além disso o PM2 tem várias outras funcionalidades para gerenciar sua aplicação e reduzir o tempo de indisponibilidade da mesma.
+Another interesting feature of the PM2 is direct monitoring at the terminal. Just type the pm2 monit command into a terminal. This screen shows CPU and memory consumption, request logs, number of requests per minute, event loop delay, how many times the server has been restarted, uptime, among others. In addition PM2 has several other features to manage your application and reduce the time it is unavailable.
 
 
 ### 3.3 - Helmet
 
 
-Helmet é um pacote que ajuda a deixar aplicações Node.js feitas com o framework Express mais seguras, configurando vários cabeçalhos HTTP. Ele não é voltado especificamente para proteção contra negação de serviço, e sim para vários tipos de vulnerabilidades que podem ser exploradas caso alguns cabeçalhos HTTP estejam mal configurados. O uso do Helmet é recomendado por vários profissionais, o próprio site oficial do Express recomenda. Düüna (2016) mostra como usando o Helmet e com apenas algumas linhas de código é possível se proteger de uma variedade de ataques, como mostra a Figura 16.
+Helmet is a package that helps make Node.js applications made with the Express framework safer by configuring multiple HTTP headers. It is not intended specifically for denial-of-service protection, but rather for several types of vulnerabilities that can be exploited if some HTTP headers are misconfigured. The use of Helmet is recommended by several professionals, the official website of Express recommends. Düüna (2016) shows how using Helmet and with just a few lines of code it is possible to protect itself from a variety of attacks, as shown in Figure 16.
 
 
-##### Figura 16: Exemplo de uso do pacote Helmet
+##### Figure 16: Example Helmet Package Usage
 
 ![helmet](/img/16.png)
 
-*Fonte: Düüna*
+*Source: Düüna*
 
 
-Observa-se que Düüna (2016) usa a configuração padrão do Helmet, e além disso configura o cabeçalho Content Security Policy (CPS). O CPS define de quais origens podem ser os scripts executados na aplicação. A opção self determina que apenas scripts do próprio domínio da aplicação podem executar. Isso previne ataques de Cross-Site Scripting (XSS).
+Note that Düüna (2016) uses the default Helmet configuration, and also configures the Content Security Policy (CPS) header. The CPS defines which sources the scripts that are running in the application can be. The self option determines that only scripts from the application's own domain can run. This prevents Cross-Site Scripting (XSS) attacks.
 
-Um dos cabeçalhos mais importantes configurado pelo Helmet é o cabeçalho X-Powered-By. Esse cabeçalho indica qual tecnologia a aplicação usa. É uma boa prática de segurança remover esse cabeçalho. Pois hackers podem usá-lo para encontrar aplicações que usam uma determinada tecnologia a qual eles encontraram uma vulnerabilidade. Removendo esse cabeçalho sua aplicação fica protegida contra esses ataques em massa.
+One of the most important headers configured by Helmet is the X-Powered-By header. This header indicates which technology the application uses. It is good practice to remove this header. Because hackers can use it to find applications that use a particular technology that they have encountered a vulnerability. Removing this header your application is protected from these bulk attacks.
 
-A Figura 17 mostra qual a configuração padrão do Helmet, usada por Düüna (2016) em seu exemplo.
+Figure 17 shows the default Helmet configuration used by Düüna (2016) in his example.
 
 
-##### Figura 17: Configuração padrão do Helmet
+##### Figure 17: Default Helmet Configuration
 
 ![helmet config](/img/17.png)
 
-*Fonte: Disponível em: <https://helmetjs.github.io/>. Acesso em: 03 mar. 2019*
+*Source: Available at: <https://helmetjs.github.io/>. Accessed on: 03 Mar. 2019*
 
 
-Ainda no tópico de cabeçalhos HTTP, mas não relacionado ao Helmet, em 27 de novembro de 2018 foi lançado uma atualização para o Node.js que resolveu duas vulnerabilidades de negação de serviço relacionadas a cabeçalhos HTTP. A primeira consiste no fato de que antes dessa atualização os cabeçalhos podiam ter até 80 kilobytes, e após a atualização só podem ter até 8 kilobytes. Isso era um problema pois usando uma combinação de requisições com cabeçalhos de tamanho máximo era possível fazer o servidor HTTP ser interrompido. A segunda vulnerabilidade era o fato de ser possível enviar cabeçalhos HTTP de maneira bem lenta, mantendo as conexões e os recursos alocados por um tempo muito longo, causando indisponibilidade para outros usuários legítimos da aplicação. Mais detalhes sobre essa atualização, e vulnerabilidades, podem ser encontrados no site oficial do Node.js.
+Also on the topic of HTTP headers but not Helmet-related, on November 27, 2018, an update was released for Node.js that resolved two denial-of-service vulnerabilities related to HTTP headers. The first is that before this update the headers could be up to 80 kilobytes, and after the update can only have up to 8 kilobytes. This was a problem because using a combination of requests with full-sized headers could cause the HTTP server to be stopped. The second vulnerability was that it was possible to send HTTP headers very slowly, keeping connections and resources allocated for a very long time, causing unavailability to other legitimate users of the application. More details about this update, and vulnerabilities, can be found on the official Node.js website.
 
 
-### 3.4 - Validação
+### 3.4 - Validation
 
 
-Nesta seção discute-se a importância de validar dados fornecidos por usuários a fim de evitar ataques de injeção de código. Mostra-se também algumas bibliotecas com foco em validação de dados.
+In this section we discuss the importance of validating data provided by users in order to avoid code injection attacks. It also shows some libraries focused on data validation.
 
-Düüna (2016) define injeção de código como um ataque no qual um código malicioso é inserido na aplicação e faz o programa executá-lo. Esse tipo de ataque faz o servidor realizar algo que não é seu propósito. Isso inclui obter informações confidenciais, modificar ou danificar o servidor, entre outros. O autor ainda afirma que por existirem diversos tipos de injeção de código, este é o tipo de ataque mais usado contra aplicações web. Segundo o autor para combater esse tipo de ataque é preciso validar os dados fornecidos pelo usuário e sanear esses dados. Isso significa remover caracteres especiais, que são usados para escrever códigos.
+Düüna (2016) defines code injection as an attack in which malicious code is inserted into the application and causes the program to execute it. This type of attack makes the server accomplish something that is not its purpose. This includes obtaining confidential information, modifying or damaging the server, among others. The author also states that because there are several types of code injection, this is the type of attack most used against web applications. According to the author to combat this type of attack it is necessary to validate the data provided by the user and to sanitize this data. This means removing special characters, which are used to write codes.
 
-Geralmente ataques de injeção de código são usados para obter ou excluir informações. Porém De Turckheim (2018) mostra que é possível realizar um ataque de negação de serviço utilizando injeção de código. Esse ataque consiste em utilizar uma falha no MongoDB, um banco de dados muito popular em aplicações Node.js. Essa falha é uma função específica do MongoDB que faz o servidor pausar por um determinado tempo. Ele mostra que injetando essa função em uma busca no banco de dados pode causar indisponibilidade na aplicação.
+Generally code injection attacks are used to get or exclude information. However De Turckheim (2018) shows that it is possible to perform a denial of service attack using code injection. This attack consists of using an exploit in MongoDB, a database very popular in Node.js. applications. This failure is a specific MongoDB function that causes the server to pause for a certain amount of time. It shows that injecting this function into a database search can cause application unavailability.
 
-Uma biblioteca para validação de dados é a Validator.js. Ela conta com mais de cinquenta funções de validação e mais de dez funções de saneamento de strings. Outras duas bibliotecas de validação são Joi (https://github.com/hapijs/joi) e Celebrate (https://github.com/arb/celebrate#readme). Joi usa esquemas no formato de objetos JavaScript para validar dados. É muito útil para validar cabeçalhos de requisições HTTP. Celebrate apenas facilita o uso da biblioteca Joi em aplicações construídas sobre o framework Express.
+A library for validating data is Validator.js. It has more than fifty validation functions and more than ten string sanitation functions. Two other validation libraries are Joi (https://github.com/hapijs/joi) and Celebrate (https://github.com/arb/celebrate#readme). Joi uses schemas in the format of JavaScript objects to validate data. It is very useful for validating HTTP request headers. Celebrate only facilitates the use of the Joi library in applications built on the Express framework.
 
-Conclui-se que é muito importante validar e sanear dados. Pois ataques de injeção de código podem causar diversos tipos de dano, inclusive negação de serviço. Também se mostrou que existem diversas bibliotecas especialmente desenvolvidas para validação e saneamento de dados. O uso delas pode significar a proteção de sua aplicação contra a maior parte dos ataques realizados na web.
+It is concluded that it is very important to validate and sanitize data. For code injection attacks can cause various types of damage, including denial of service. It has also been shown that there are a number of specially developed libraries for data validation and sanitation. Using them can mean protecting your application against most web attacks.
 
 
 [Back to Summary](#Summary)
