@@ -164,7 +164,7 @@ Node.js é uma tecnologia relativamente nova que ganhou popularidade rapidamente
 O método utilizado foi a pesquisa bibliográfica, realizada em livros e sites relacionados a segurança de aplicações web, Node.js, e combate a vulnerabilidades.
 
 
-[Voltar ao Sumário](#Sumário)
+▲ Voltar ao Sumário](#Sumário)
 
 
 ## 1 - Conceitos Básicos
@@ -229,7 +229,7 @@ Mueller (2016) enfatiza que uma parte importante de um ataque DoS é requisitar 
 Nahari e Krutz categorizam as soluções para combater ataques DoS em dois tipos: preventivas e reativas. Soluções preventivas impedem o ataque tomando medidas de precaução, como por exemplo: filtros, estabelecimento de limites, esconder a localização de recursos e detecção de intrusos. Já as soluções reativas são acionadas durante o ataque e geralmente tem o objetivo de determinar a origem do ataque, alguns exemplos são: marcação de pacotes, testes de conexão e coleta de dados em registros (logs).
 
 
-[Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
 
 
 ## 2 - O Loop de Eventos
@@ -414,7 +414,7 @@ Da sétima linha à nona linha, exibe-se o resultado da aplicação assíncrona 
 Conclui-se então que é melhor optar por código síncrono quando o bloqueio não é um problema, por exemplo na inicialização de um servidor pois o código executa apenas uma vez e ainda não entrou no loop de eventos. Já para operações dentro do loop de eventos é melhor optar pela opção assíncrona com streams, quando possível, principalmente para lidar com arquivos grandes, pois além de ser mais rápida, é mais leve em relação a memória como já foi visto anteriormente.
 
 
-[Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
 
 
 ## 3 - Bibliotecas
@@ -585,7 +585,7 @@ Uma biblioteca para validação de dados é a Validator.js. Ela conta com mais d
 Conclui-se que é muito importante validar e sanear dados. Pois ataques de injeção de código podem causar diversos tipos de dano, inclusive negação de serviço. Também se mostrou que existem diversas bibliotecas especialmente desenvolvidas para validação e saneamento de dados. O uso delas pode significar a proteção de sua aplicação contra a maior parte dos ataques realizados na web.
 
 
-[Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
 
 
 ## 4 - Expressões Regulares
@@ -680,7 +680,7 @@ Observa-se na tabela 1 que o tempo de resposta da aplicação aproximadamente do
 Goldberg et al (2019), recomendam usar, quando possível, uma biblioteca de validação, como por exemplo a validator.js já citada na seção 4.4. Quando for necessário usar uma expressão regular recomendam o uso da biblioteca safe-regex, que detecta expressões regulares potencialmente vulneráveis a ataques de negação de serviço. Os autores ainda recomendam validar o tamanho máximo da entrada antes de realizar qualquer operação com a mesma (incluindo testes com regex). Pois assim evita-se que, caso haja uma vulnerabilidade, o atacante não tenha o poder de usar uma entrada muito grande, minimizando os danos.
 
 
-[Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
 
 
 ## 5 - Boas Práticas
@@ -731,7 +731,7 @@ Também se observou algumas boas práticas em Node.js que ajudam a mitigar vulne
 Conclui-se assim que muitas vulnerabilidades de negação de serviço podem ser evitadas tomando-se medidas mostradas neste trabalho. No ambiente de segurança da informação, novas tecnologias e técnicas surgem a todo momento, tanto para ajudar na segurança quanto para tentar quebrá-la. Portanto é importante também manter-se sempre atualizado sobre novos tipos de vulnerabilidades, ameaças e como combatê-las, para que suas aplicações estejam sempre protegidas da melhor maneira possível.
 
 
-[Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
 
 
 ## Referências Bibliográficas
@@ -816,7 +816,7 @@ VALIDATOR.JS. Biblioteca para aplicações Node.js que valida dados, 2019. Dispo
 WHITMAN, Michael E.; MATTORD, Hebert J. Principles of Information Security. 4. ed. Boston: Course Technology, 2011.
 
 
-[Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
 
 
 ## Apêndice A
@@ -834,4 +834,4 @@ Biblioteca crono.js, utilizada para cronometrar o tempo de execução nos exempl
 
 
 
-[Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
