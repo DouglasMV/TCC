@@ -47,29 +47,29 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 ## List of Figures
 
 
-- [Figura 1 - Diagrama de um servidor multi-threaded bloqueante](#Figura-1-Diagrama-de-um-servidor-multi-threaded-bloqueante)
-- [Figura 2 - Diagrama de um servidor single-threaded não bloqueante](#Figura-2-Diagrama-de-um-servidor-single-threaded-não-bloqueante)
+- [Figure 1 - Diagram of a multi-threaded blocking server](#Figure-1-Diagram-of-a-multi-threaded-blocking-server)
+- [Figure 2 - Diagram of a non-blocking single-threaded server](#Figure-2-Diagram-of-a-non-blocking-single-threaded-server)
 - [Figura 3 - Diagrama do loop de eventos](#Figura-3-Diagrama-do-loop-de-eventos)
-- [Figura 4 - Lendo um arquivo usando buffer](#Figura-4-Lendo-um-arquivo-usando-buffer)
-- [Figura 5 - Lendo um arquivo usando stream](#Figura-5-Lendo-um-arquivo-usando-stream)
-- [Figura 6 - Arquivo zipSync.js](#Figura-6-Arquivo-zipSync.js)
-- [Figura 7 - Arquivo zipAsync.js](#Figura-7-Arquivo-zipAsync.js)
-- [Figura 8 - Arquivo zipStream.js](#Figura-8-Arquivo-zipStream.js)
-- [Figura 9 - Execução das três implementações da aplicação](#Figura-9-Execução-das-três-implementações-da-aplicação)
-- [Figura 10 - Comando npm audit em uma aplicação com vulnerabilidades conhecidas](#Figura-10-Comando-npm-audit-em-uma-aplicação-com-vulnerabilidades-conhecidas)
-- [Figura 11 - Comando npm audit em uma aplicação sem vulnerabilidades conhecidas](#Figura-11-Comando-npm-audit-em-uma-aplicação-sem-vulnerabilidades-conhecidas)
-- [Figura 12 - Comando snyk test em uma aplicação com vulnerabilidades conhecidas](#Figura-12-Comando-snyk-test-em-uma-aplicação-com-vulnerabilidades-conhecidas)
-- [Figura 13 - Comandos snyk test e snyk monitor em aplicação sem vulnerabilidades conhecidas](#Figura-13-Comandos-snyk-test-e-snyk-monitor-em-aplicação-sem-vulnerabilidades-conhecidas)
-- [Figura 14 - Exemplo de uso da biblioteca express-rate-limit](#Figura-14-Exemplo-de-uso-da-biblioteca-express-rate-limit)
-- [Figura 15 - Lista de processos iniciados com o comando pm2 start](#Figura-15-Lista-de-processos-iniciados-com-o-comando-pm2-start)
-- [Figura 16 - Exemplo de uso do pacote Helmet](#Figura-16-Exemplo-de-uso-do-pacote-Helmet)
-- [Figura 17 - Configuração padrão do Helmet](#Figura-17-Configuração-padrão-do-Helmet)
-- [Figura 18 - Exemplo de uso de expressão regular (arquivo regex.js)](#Figura-18-Exemplo-de-uso-de-expressão-regular-arquivo-regex.js)
-- [Figura 19 - Resultado da execução do arquivo regex.js](#Figura-19-Resultado-da-execução-do-arquivo-regex.js)
-- [Figura 20 - Exemplo de aplicação com expressão regular vulnerável](#Figura-20-Exemplo-de-aplicação-com-expressão-regular-vulnerável)
-- [Figura 21 - Usando a aplicação com uma entrada válida](#Figura-21-Usando-a-aplicação-com-uma-entrada-válida)
-- [Figura 22 - Usando a aplicação com uma entrada maliciosa](#Figura-22-Usando-a-aplicação-com-uma-entrada-maliciosa)
-- [Figura 23 – Arquivo crono.js](#Figura-23-Arquivo-crono.js)
+- [Figure 4 - Reading a file using buffer](#Figure-4-Reading-a-file-using-buffer)
+- [Figure 5 - Reading a file using stream](#Figure-5-Reading-a-file-using-stream)
+- [Figure 6 - zipSync.js file](#Figure-6-zipSync.js-file)
+- [Figure 7 - zipAsync.js file](#Figure-7-zipAsync.js-file)
+- [Figure 8 - zipStream.js file](#Figure-8-zipStream.js-file)
+- [Figure 9 - Running the three implementations of the application](#Figure-9-Running-the-three-implementations-of-the-application)
+- [Figure 10 - npm audit command in an application with known vulnerabilities](#Figure-10-npm-audit-command-in-an-application-with-known-vulnerabilities)
+- [Figure 11 - npm audit command in an application without known vulnerabilities](#Figure-11-npm-audit-command-in-an-application-without-known-vulnerabilities)
+- [Figure 12 - snyk test command in an application with known vulnerabilities](#Figure-12-snyk-test-command-in-an-application-with-known-vulnerabilities)
+- [Figure 13 - snyk test and snyk monitor commands in application without known vulnerabilities](#Figure-13-snyk-test-and-snyk-monitor-commands-in-application-without-known-vulnerabilities)
+- [Figure 14 - Example of using the express-rate-limit library](#Figure-14-Example-of-using-the-express-rate-limit-library)
+- [Figure 15 - List of processes started with the pm2 start command](#Figure-15-List-of-processes-started-with-the-pm2-start-command)
+- [Figure 16 - Example Helmet Package Usage](#Figure-16-Example-Helmet-Package-Usage)
+- [Figure 17 - Default Helmet Configuration](#Figure-17-Default-Helmet-Configuration)
+- [Figure 18 - Example of regular expression usage (regex.js file)](#Figure-18-Example-of-regular-expression-usage-regex.js-file)
+- [Figure 19 - Result of running the regex.js file](#Figure-19-Result-of-running-the-regex.js-file)
+- [Figure 20 - Application example with vulnerable regular expression](#Figure-20-Application-example-with-vulnerable-regular-expression)
+- [Figure 21 - Using the Application with a Valid Input](#Figure-21-Using-the-Application-with-a-Valid-Input)
+- [Figure 22 - Using the Application with a Malicious Input](#Figure-22-Using-the-Application-with-a-Malicious-Input)
+- [Figure 23 - crono.js file](#Figure-23-crono.js-file)
 
 
 
@@ -104,28 +104,28 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 ## Summary
 
 
-- [Introdução](#Introdução)
-- [1 - Conceitos Básicos](#1---Conceitos-Básicos)
-- [1.1 - Segurança da Informação](#11---Segurança-da-Informação)
-- [1.2 - Aplicações Web](#12---Aplicações-Web)
+- [Introduction](#Introduction)
+- [1 - Basic Concepts](#1---Basic-Concepts)
+- [1.1 - Information Security](#11---Information-Security)
+- [1.2 - Web Applications](#12---Web-Applications)
 - [1.3 - Node.js](#13---Nodejs)
-- [1.4 - Negação de Serviço](#14---Negação-de-Serviço)
-- [2 - O Loop de Eventos](#2---O-Loop-de-Eventos)
-- [2.1 - Bloqueante X Não Bloqueante](#21---Bloqueante-X-Não-Bloqueante)
-- [2.2 - O que é o Loop de Eventos](#22---O-que-é-o-Loop-de-Eventos)
-- [2.3 - Síncrno X Assíncrono](#23---Síncrono-X-Assíncrono)
+- [1.4 - Denial of Service](#14---Denial-of-Service)
+- [2 - The Event Loop](#2---The-Event-Loop)
+- [2.1 - Blocking X Non-Blocking](#21---Blocking-X-Non-Blocking)
+- [2.2 - What is the Event Loop](#22---What-is-the-Event-Loop)
+- [2.3 - Synchronous X Asynchronous](#23---Synchronous-X-Asynchronous)
 - [2.4 - Streams](#24---Streams)
-- [2.5 - Exemplo Prático](#25---Exemplo-Prático)
-- [3 - Bibliotecas](#3---Bibliotecas)
+- [2.5 - Practical Example](#25---Practical-Example)
+- [3 - Libraries](#3---Libraries)
 - [3.1 - Express-rate-limit](#31---Express-rate-limit)
 - [3.2 - PM2](#32---PM2)
 - [3.3 - Helmet](#33---Helmet)
-- [3.4 - Validação](#34---Validação)
-- [4 - Expressões Regulares](#4---Expressões-Regulares)
-- [5 - Boas Práticas](#5---boas-práticas)
-- [Considerações Finais](#Considerações-Finais)
-- [Referências Bibliográficas](#Referências-Bibliográficas)
-- [Apêndice A](#Apêndice-A)
+- [3.4 - Validation](#34---Validation)
+- [4 - Regular Expressions](#4---Regular-Expressions)
+- [5 - Best Practices](#5---Best-Practices)
+- [Final Considerations](#Final-Considerations)
+- [Bibliographic References](#Bibliographic-References)
+- [Appendix A](#Appendix-A)
 
 
 
@@ -639,7 +639,7 @@ The fourth and final rule is to use the indexOf method when you need a simple qu
 Figure 20 shows an example of a vulnerable regular expression because it does not obey the first rule. In fact it is the same example used to explain this rule earlier. The vulnerable regular expression is /(\d+)+$/. This code creates a web server that reads a string passed by the URL (Uniform Resource Locator) and uses the regular expression to check if the string ends in numeric digits. Obviously this is not the best way to do this, but to demonstrate a denial-of-service attack by exploiting vulnerable regular expressions is a good example because the code is succinct. After requesting a URL using a browser, the value of the input string, whether it was validated by the regex, and the time the server took it to evaluate the string using the regex and give the answer, is printed on the screen.
 
 
-##### Figure 21: Using the Application with a Valid Input/Output
+##### Figure 21: Using the Application with a Valid Input
 ![regex valid](/img/21.png)
 
 *Source: Own authorship*
@@ -710,7 +710,7 @@ Düüna (2016) highlights some good practices to avoid denial of service attacks
 [Back to Summary](#Summary)
 
 
-## Final considerations
+## Final Considerations
 
 
 This work showed concepts of information security as vulnerability, threat, availability and denial of service. In addition, the most common denial of service vulnerabilities in Node.js applications, and how to avoid them have been seen.
@@ -733,84 +733,84 @@ It is concluded that many denial of service vulnerabilities can be avoided by ta
 [Back to Summary](#Summary)
 
 
-## Bibliographic references
+## Bibliographic References
 
 
-BELDER, BERT. Everything You Need to Know About Node.js Event Loop. In: Node.js Interactive 2016, Vancouver, 24 set. 2016. Disponível em: <https://www.youtube.com/watch?v=PNa9OMajw9w> Acesso em: 20 fev. 2019.
+BELDER, BERT. Everything You Need to Know About Node.js Event Loop. In: Node.js Interactive 2016, Vancouver, 24 set. 2016. Available in: <https://www.youtube.com/watch?v=PNa9OMajw9w> Access in: 20 fev. 2019.
 
 CASCIARO, Mario; MAMMINO, Luciano. Node.js Design Patterns. 2. ed. Birmingham: Packt Publishing, 2016.
 
-CELEBRATE. Biblioteca para aplicações Node.js/Express para validação de dados, 2019. Disponível em: <https://github.com/arb/celebrate#readme> Acesso em: 04 mar. 2019.
+CELEBRATE. Biblioteca para aplicações Node.js/Express para validação de dados, 2019. Available in: <https://github.com/arb/celebrate#readme> Access in: 04 mar. 2019.
 
-COLLINA, Matteo. Protecting Node.js from uncontrolled resource consumption headers attacks. 28 nov. 2018. Disponível em: <https://www.nearform.com/blog/protecting-node-js-from-uncontrolled-resourceconsumption-headers-attacks/> Acesso em: 20 fev. 2019.
+COLLINA, Matteo. Protecting Node.js from uncontrolled resource consumption headers attacks. 28 nov. 2018. Available in: <https://www.nearform.com/blog/protecting-node-js-from-uncontrolled-resourceconsumption-headers-attacks/> Access in: 20 fev. 2019.
 
-DAHL, Ryan. 10 Things I Regret About Node.js. In: JSConf EU 2018, Berlin, 6 jun. 2018. Disponível em: <https://www.youtube.com/watch?v=M3BM9TB-8yA> Acesso em: 20 fev. 2019.
+DAHL, Ryan. 10 Things I Regret About Node.js. In: JSConf EU 2018, Berlin, 6 jun. 2018. Available in: <https://www.youtube.com/watch?v=M3BM9TB-8yA> Access in: 20 fev. 2019.
 
-DAVIS, James C. A Sense of Time for JavaScript and Node.js. In: USENIX Security ‘18, Santa Clara, 18 set. 2018. Disponível em: <https://www.youtube.com/watch?v=Dm7Xyw3KueY> Acesso em: 20 fev. 2019.
+DAVIS, James C. A Sense of Time for JavaScript and Node.js. In: USENIX Security ‘18, Santa Clara, 18 set. 2018. Available in: <https://www.youtube.com/watch?v=Dm7Xyw3KueY> Access in: 20 fev. 2019.
 
-DE TURCKHEIM, Vladimir. Node.js Applicative DoS Through MongoDB Injection. In: Node.js Interactive 2018, Vancouver, 19 out. 2018. Disponível em: <https://www.youtube.com/watch?v=xJWZsoYmsIE> Acesso em: 20 fev. 2019.
+DE TURCKHEIM, Vladimir. Node.js Applicative DoS Through MongoDB Injection. In: Node.js Interactive 2018, Vancouver, 19 out. 2018. Available in: <https://www.youtube.com/watch?v=xJWZsoYmsIE> Access in: 20 fev. 2019.
 
 DÜÜNA, Karl; RASHID, Fahmida Y. (Ed.). Secure Your Node.js Web Application. Raleigh: Pragmatic Programmers LLC, 2016.
 
-EXPRESS. Production Best Practices: Security. Boas práticas de segurança para aplicações Node.js/Express. Disponível em: <https://expressjs.com/en/advanced/best-practice-security.html> Acesso em: 20 fev. 2019.
+EXPRESS. Production Best Practices: Security. Boas práticas de segurança para aplicações Node.js/Express. Available in: <https://expressjs.com/en/advanced/best-practice-security.html> Access in: 20 fev. 2019.
 
-EXPRESS RATE LIMIT. Biblioteca para aplicações Node.js/Express que limita o número de requisições a um servidor http, 2019. Disponível em: <https://github.com/nfriedly/express-rate-limit> Acesso em: 03 mar. 2019.
+EXPRESS RATE LIMIT. Biblioteca para aplicações Node.js/Express que limita o número de requisições a um servidor http, 2019. Available in: <https://github.com/nfriedly/express-rate-limit> Access in: 03 mar. 2019.
 
-GOLDBERG, Yoni. et al. Node.js Best Practices. 2019. Disponível em: <https://github.com/i0natan/nodebestpractices> Acesso em: 17 abr. 2019.
+GOLDBERG, Yoni. et al. Node.js Best Practices. 2019. Available in: <https://github.com/i0natan/nodebestpractices> Access in: 17 abr. 2019.
 
-HELMET. Biblioteca para aplicações Node.js/Express que ajuda a proteger aplicações configurando cabeçalhos http, 2019. Disponível em: <https://helmetjs.github.io/> Acesso em: 03 mar. 2019.
+HELMET. Biblioteca para aplicações Node.js/Express que ajuda a proteger aplicações configurando cabeçalhos http, 2019. Available in: <https://helmetjs.github.io/> Access in: 03 mar. 2019.
 
-JOI. Biblioteca para aplicações Node.js que valida dados, 2019. Disponível em: <https://github.com/hapijs/joi>. Acesso em: 04 mar. 2019.
+JOI. Biblioteca para aplicações Node.js que valida dados, 2019. Available in: <https://github.com/hapijs/joi>. Access in: 04 mar. 2019.
 
-KANTOR, Ilya. et al. The Modern JavaScript Tutorial. Disponível em: <https://javascript.info/> Acesso em: 11 mar. 2019.
+KANTOR, Ilya. et al. The Modern JavaScript Tutorial. Available in: <https://javascript.info/> Access in: 11 mar. 2019.
 
 MUELLER, John Paul. Security for Web Developers. 1. Ed. Sebastopol: O’Reilly Media Inc, 2016.
 
 NAHARI, Hadi; KRUTZ, Ronald L. Web Commerce Security Design and Development. Indianapolis: Wiley Publishing Inc, 2011.
 
-NODE.JS. Don’t Block the Event Loop (or the Worker Pool). Disponível em: <https://nodejs.org/en/docs/guides/dont-block-the-event-loop/> Acesso em: 20 fev. 2019.
+NODE.JS. Don’t Block the Event Loop (or the Worker Pool). Available in: <https://nodejs.org/en/docs/guides/dont-block-the-event-loop/> Access in: 20 fev. 2019.
 
-NODE.JS. November 2018 Security Releases. Disponível em: <https://nodejs.org/en/blog/vulnerability/november-2018-security-releases/> Acesso em: 20 fev. 2019.
+NODE.JS. November 2018 Security Releases. Available in: <https://nodejs.org/en/blog/vulnerability/november-2018-security-releases/> Access in: 20 fev. 2019.
 
-NODE.JS. Overview of Blocking vs. Non-Blocking. Disponível em: <https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/> Acesso em: 20 fev. 2019.
+NODE.JS. Overview of Blocking vs. Non-Blocking. Available in: <https://nodejs.org/en/docs/guides/blocking-vs-non-blocking/> Access in: 20 fev. 2019.
 
-NODE.JS. The Node.js Event Loop, Timers and process.nextTick(). Disponível em: <https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/> Acesso em: 20 fev. 2019.
+NODE.JS. The Node.js Event Loop, Timers and process.nextTick(). Available in: <https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/> Access in: 20 fev. 2019.
 
-NODE.JS. The Node.js Event Loop, Timers and process.nextTick(). Disponível em: <https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/> Acesso em: 20 fev. 2019.
+NODE.JS. The Node.js Event Loop, Timers and process.nextTick(). Available in: <https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/> Access in: 20 fev. 2019.
 
-NPM Security Advisories. Banco de dados oficial de vulnerabilidades em bibliotecas distribuídos pelo NPM, 2019. Disponível em: <https://www.npmjs.com/advisories>. Acesso em: 20 fev. 2019.
+NPM Security Advisories. Banco de dados oficial de vulnerabilidades em bibliotecas distribuídos pelo NPM, 2019. Available in: <https://www.npmjs.com/advisories>. Access in: 20 fev. 2019.
 
-NPMS. Ferramenta de busca de bibliotecas para Node.js. Disponível em: <https://npms.io/> Acesso em: 20 fev. 2019.
+NPMS. Ferramenta de busca de bibliotecas para Node.js. Available in: <https://npms.io/> Access in: 20 fev. 2019.
 
 O’HANLEY, Richard (Ed.); TILLER, James S. (Ed.). Information Security Management Handbook. 6. ed. Boca Raton: CRC Press, 2014.
 
-OPEN WEB APPLICATION SECURITY PROJECT. Denial of Service. 2 fev. 2015. Disponível em: <https://www.owasp.org/index.php/Denial_of_Service> Acesso em: 20 fev. 2019.
+OPEN WEB APPLICATION SECURITY PROJECT. Denial of Service. 2 fev. 2015. Available in: <https://www.owasp.org/index.php/Denial_of_Service> Access in: 20 fev. 2019.
 
-OPEN WEB APPLICATION SECURITY PROJECT. Regular expression Denial of Service - ReDoS. 2 fev. 2015. Disponível em: <https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS> Acesso em: 20 fev. 2019.
+OPEN WEB APPLICATION SECURITY PROJECT. Regular expression Denial of Service - ReDoS. 2 fev. 2015. Available in: <https://www.owasp.org/index.php/Regular_expression_Denial_of_Service_-_ReDoS> Access in: 20 fev. 2019.
 
 PELTIER, Thomas R. Information Security Fundamentals. 2. ed. Boca Raton: CRC Press, 2014.
 
-PM2. Biblioteca para aplicações Node.js/Express que gerencia processos, 2019. Disponível em: <https://pm2.io/doc/en/runtime/overview/> Acesso em: 03 mar. 2019.
+PM2. Biblioteca para aplicações Node.js/Express que gerencia processos, 2019. Available in: <https://pm2.io/doc/en/runtime/overview/> Access in: 03 mar. 2019.
 
 RHODES-OUSLEY, Mark. Information Security - The Complete Reference. 2. ed. New York: McGraw-Hill Education, 2013
 
-SAFE-REGEX. Biblioteca para aplicações Node.js que detecta expressões regulares vulneráveis, 2019. Disponível em: <https://github.com/davisjam/safe-regex> Acesso em: 26 mar. 2019.
+SAFE-REGEX. Biblioteca para aplicações Node.js que detecta expressões regulares vulneráveis, 2019. Available in: <https://github.com/davisjam/safe-regex> Access in: 26 mar. 2019.
 
-SAMUEL, Mike. A Node.js Security Roadmap. In: JSConf EU 2018, Berlin, 17 jul. 2018. Disponível em: <https://www.youtube.com/watch?v=1Gun2lRb5Gw> Acesso em: 20 fev. 2019.
+SAMUEL, Mike. A Node.js Security Roadmap. In: JSConf EU 2018, Berlin, 17 jul. 2018. Available in: <https://www.youtube.com/watch?v=1Gun2lRb5Gw> Access in: 20 fev. 2019.
 
-SHARMA, Tarun. Secure Node JS Apps. 24 jun. 2018. Disponível em: <https://medium.com/@tkssharma/secure-node-js-apps-7613973b6971> Acesso em: 20 fev. 2019.
+SHARMA, Tarun. Secure Node JS Apps. 24 jun. 2018. Available in: <https://medium.com/@tkssharma/secure-node-js-apps-7613973b6971> Access in: 20 fev. 2019.
 
 SIMPSON, Kyle. You Don’t Know JS: Async & Performance. Sebastopol : O’Reilly Media, 2015.
 
-SNYK. Empresa que mantém bancos de dados de vulnerabilidades em várias bibliotecas de código aberto, 2019. Disponível em: <https://snyk.io/vuln/> Acesso em: 20 fev. 2019.
+SNYK. Empresa que mantém bancos de dados de vulnerabilidades em várias bibliotecas de código aberto, 2019. Available in: <https://snyk.io/vuln/> Access in: 20 fev. 2019.
 
-STAICU, Cristian-Alexandru. Freezing the Web: A Study of ReDoS Vulnerabilities in JavaScript-based Web Servers. In: USENIX Security ‘18, Santa Clara, 18 set. 2018. Disponível em: <https://www.youtube.com/watch?v=612mO3Ieexs> Acesso em: 20 fev. 2019.
+STAICU, Cristian-Alexandru. Freezing the Web: A Study of ReDoS Vulnerabilities in JavaScript-based Web Servers. In: USENIX Security ‘18, Santa Clara, 18 set. 2018. Available in: <https://www.youtube.com/watch?v=612mO3Ieexs> Access in: 20 fev. 2019.
 
 TEIXEIRA, Pedro. Professional Node.js. Indianapolis: John Wiley & Sons Inc, 2013.
 
 TRIBUNAL DE CONTAS DA UNIÃO. Boas Práticas em Segurança da Informação. 4. ed. Brasília: TCU, Secretaria de Fiscalização de Tecnologia da Informação, 2012.
 
-VALIDATOR.JS. Biblioteca para aplicações Node.js que valida dados, 2019. Disponível em: <https://github.com/chriso/validator.js>. Acesso em: 04 mar. 2019.
+VALIDATOR.JS. Biblioteca para aplicações Node.js que valida dados, 2019. Available in: <https://github.com/chriso/validator.js>. Access in: 04 mar. 2019.
 
 WHITMAN, Michael E.; MATTORD, Hebert J. Principles of Information Security. 4. ed. Boston: Course Technology, 2011.
 
