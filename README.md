@@ -52,9 +52,9 @@ Este trabalho apresenta algumas das principais vulnerabilidades de negação de 
 - [Figura 3 - Diagrama do loop de eventos](#Figura-3-Diagrama-do-loop-de-eventos)
 - [Figura 4 - Lendo um arquivo usando buffer](#Figura-4-Lendo-um-arquivo-usando-buffer)
 - [Figura 5 - Lendo um arquivo usando stream](#Figura-5-Lendo-um-arquivo-usando-stream)
-- [Figura 6 - Arquivo zipSync.js](#Figura-6-Arquivo-zipSync.js)
-- [Figura 7 - Arquivo zipAsync.js](#Figura-7-Arquivo-zipAsync.js)
-- [Figura 8 - Arquivo zipStream.js](#Figura-8-Arquivo-zipStream.js)
+- [Figura 6 - Arquivo zipSync.js](#Figura-6-Arquivo-zipSyncjs)
+- [Figura 7 - Arquivo zipAsync.js](#Figura-7-Arquivo-zipAsyncjs)
+- [Figura 8 - Arquivo zipStream.js](#Figura-8-Arquivo-zipStreamjs)
 - [Figura 9 - Execução das três implementações da aplicação](#Figura-9-Execução-das-três-implementações-da-aplicação)
 - [Figura 10 - Comando npm audit em uma aplicação com vulnerabilidades conhecidas](#Figura-10-Comando-npm-audit-em-uma-aplicação-com-vulnerabilidades-conhecidas)
 - [Figura 11 - Comando npm audit em uma aplicação sem vulnerabilidades conhecidas](#Figura-11-Comando-npm-audit-em-uma-aplicação-sem-vulnerabilidades-conhecidas)
@@ -64,12 +64,12 @@ Este trabalho apresenta algumas das principais vulnerabilidades de negação de 
 - [Figura 15 - Lista de processos iniciados com o comando pm2 start](#Figura-15-Lista-de-processos-iniciados-com-o-comando-pm2-start)
 - [Figura 16 - Exemplo de uso do pacote Helmet](#Figura-16-Exemplo-de-uso-do-pacote-Helmet)
 - [Figura 17 - Configuração padrão do Helmet](#Figura-17-Configuração-padrão-do-Helmet)
-- [Figura 18 - Exemplo de uso de expressão regular (arquivo regex.js)](#Figura-18-Exemplo-de-uso-de-expressão-regular-arquivo-regex.js)
-- [Figura 19 - Resultado da execução do arquivo regex.js](#Figura-19-Resultado-da-execução-do-arquivo-regex.js)
+- [Figura 18 - Exemplo de uso de expressão regular (arquivo regex.js)](#Figura-18-Exemplo-de-uso-de-expressão-regular-arquivo-regexjs)
+- [Figura 19 - Resultado da execução do arquivo regex.js](#Figura-19-Resultado-da-execução-do-arquivo-regexjs)
 - [Figura 20 - Exemplo de aplicação com expressão regular vulnerável](#Figura-20-Exemplo-de-aplicação-com-expressão-regular-vulnerável)
 - [Figura 21 - Usando a aplicação com uma entrada válida](#Figura-21-Usando-a-aplicação-com-uma-entrada-válida)
 - [Figura 22 - Usando a aplicação com uma entrada maliciosa](#Figura-22-Usando-a-aplicação-com-uma-entrada-maliciosa)
-- [Figura 23 – Arquivo crono.js](#Figura-23-Arquivo-crono.js)
+- [Figura 23 – Arquivo crono.js](#Figura-23-Arquivo-cronojs)
 
 
 
@@ -164,7 +164,7 @@ Node.js é uma tecnologia relativamente nova que ganhou popularidade rapidamente
 O método utilizado foi a pesquisa bibliográfica, realizada em livros e sites relacionados a segurança de aplicações web, Node.js, e combate a vulnerabilidades.
 
 
-▲ Voltar ao Sumário](#Sumário)
+▲ [Voltar ao Sumário](#Sumário)
 
 
 ## 1 - Conceitos Básicos
