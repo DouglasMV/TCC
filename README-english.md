@@ -49,12 +49,12 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 
 - [Figure 1 - Diagram of a multi-threaded blocking server](#Figure-1-Diagram-of-a-multi-threaded-blocking-server)
 - [Figure 2 - Diagram of a non-blocking single-threaded server](#Figure-2-Diagram-of-a-non-blocking-single-threaded-server)
-- [Figura 3 - Diagrama do loop de eventos](#Figura-3-Diagrama-do-loop-de-eventos)
+- [Figure 3 - Event Loop Diagram](#Figure-3-Event-Loop-Diagram)
 - [Figure 4 - Reading a file using buffer](#Figure-4-Reading-a-file-using-buffer)
 - [Figure 5 - Reading a file using stream](#Figure-5-Reading-a-file-using-stream)
-- [Figure 6 - zipSync.js file](#Figure-6-zipSync.js-file)
-- [Figure 7 - zipAsync.js file](#Figure-7-zipAsync.js-file)
-- [Figure 8 - zipStream.js file](#Figure-8-zipStream.js-file)
+- [Figure 6 - zipSync.js file](#Figure-6-zipSyncjs-file)
+- [Figure 7 - zipAsync.js file](#Figure-7-zipAsyncjs-file)
+- [Figure 8 - zipStream.js file](#Figure-8-zipStreamjs-file)
 - [Figure 9 - Running the three implementations of the application](#Figure-9-Running-the-three-implementations-of-the-application)
 - [Figure 10 - npm audit command in an application with known vulnerabilities](#Figure-10-npm-audit-command-in-an-application-with-known-vulnerabilities)
 - [Figure 11 - npm audit command in an application without known vulnerabilities](#Figure-11-npm-audit-command-in-an-application-without-known-vulnerabilities)
@@ -64,12 +64,12 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 - [Figure 15 - List of processes started with the pm2 start command](#Figure-15-List-of-processes-started-with-the-pm2-start-command)
 - [Figure 16 - Example Helmet Package Usage](#Figure-16-Example-Helmet-Package-Usage)
 - [Figure 17 - Default Helmet Configuration](#Figure-17-Default-Helmet-Configuration)
-- [Figure 18 - Example of regular expression usage (regex.js file)](#Figure-18-Example-of-regular-expression-usage-regex.js-file)
-- [Figure 19 - Result of running the regex.js file](#Figure-19-Result-of-running-the-regex.js-file)
+- [Figure 18 - Example of regular expression usage (regex.js file)](#Figure-18-Example-of-regular-expression-usage-regexjs-file)
+- [Figure 19 - Result of running the regex.js file](#Figure-19-Result-of-running-the-regexjs-file)
 - [Figure 20 - Application example with vulnerable regular expression](#Figure-20-Application-example-with-vulnerable-regular-expression)
 - [Figure 21 - Using the Application with a Valid Input](#Figure-21-Using-the-Application-with-a-Valid-Input)
 - [Figure 22 - Using the Application with a Malicious Input](#Figure-22-Using-the-Application-with-a-Malicious-Input)
-- [Figure 23 - crono.js file](#Figure-23-crono.js-file)
+- [Figure 23 - crono.js file](#Figure-23-cronojs-file)
 
 
 
@@ -164,7 +164,7 @@ Node.js is a relatively new technology that has rapidly gained popularity, so th
 The method used was the bibliographic research, carried out in books and websites related to web application security, Node.js, and vulnerability combat.
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## 1 - Basic Concepts
@@ -229,7 +229,7 @@ Mueller (2016) emphasizes that an important part of a DoS attack is to require a
 Nahari and Krutz categorize solutions to combat DoS attacks in two types: preventive and reactive. Preventive solutions prevent attack by taking precautionary measures, such as filters, setting limits, hiding resource locations, and detecting intruders. Already the reactive solutions are triggered during the attack and generally have the purpose of determining the origin of the attack, some examples are: marking of packages, tests of connection and data collection in registries (logs).
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## 2 - The Event Loop
@@ -414,7 +414,7 @@ From the seventh line to the ninth line, the result of the asynchronous applicat
 It is concluded that it is better to opt for synchronous code when blocking is not a problem, for example when starting a server because the code only executes once and has not yet entered the event loop. Already for operations inside the event loop it is better to opt for the asynchronous option with streams, when possible, mainly to handle large files, because besides being faster, it is lighter in relation to the memory as already seen previously.
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## 3 - Libraries
@@ -585,7 +585,7 @@ A library for validating data is Validator.js. It has more than fifty validation
 It is concluded that it is very important to validate and sanitize data. For code injection attacks can cause various types of damage, including denial of service. It has also been shown that there are a number of specially developed libraries for data validation and sanitation. Using them can mean protecting your application against most web attacks.
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## 4 - Regular Expressions
@@ -680,7 +680,7 @@ It is observed in Table 1 that the response time of the application approximatel
 Goldberg et al. (2019) recommend using, where possible, a validation library, such as the validator.js already mentioned in section 4.4. When it is necessary to use a regular expression, they recommend using the safe-regex library, which detects regular expressions potentially vulnerable to denial of service attacks. Authors further recommend validating the maximum input size before performing any operation with it (including regex testing). For this way, it is avoided that, in case of a vulnerability, the attacker does not have the power to use a very large input, minimizing damages.
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## 5 - Best Practices
@@ -707,7 +707,7 @@ The Node.js documentation highlights the good practice of validating the size of
 Düüna (2016) highlights some good practices to avoid denial of service attacks through asymmetric functions. Asymmetric functions are those whose runtime depends on the size of the user input. The first recommendation of the author is to avoid asymmetric functions when possible. But sometimes there is no way to avoid them, so the author recommends limiting the size of the entry, as seen in the previous paragraph. Düüna (2016) further recommends that only authenticated users can use asymmetric functions, reducing the possibility of denial of service attacks.
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## Final Considerations
@@ -730,7 +730,7 @@ It is also important to highlight that the vulnerabilities seen in this work do 
 It is concluded that many denial of service vulnerabilities can be avoided by taking measures shown in this work. In the information security environment, new technologies and techniques are emerging at all times, both to help with security and to try to break it. Therefore, it is also important to keep up-to-date on new types of vulnerabilities, threats and how to combat them so that your applications are always protected in the best possible way.
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## Bibliographic References
@@ -815,7 +815,7 @@ VALIDATOR.JS. Biblioteca para aplicações Node.js que valida dados, 2019. Avail
 WHITMAN, Michael E.; MATTORD, Hebert J. Principles of Information Security. 4. ed. Boston: Course Technology, 2011.
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
 
 
 ## Appendix A
@@ -833,4 +833,4 @@ Library crono.js, used to time the execution time in the examples of section 2.5
 
 
 
-[Back to Summary](#Summary)
+▲ [Back to Summary](#Summary)
