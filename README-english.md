@@ -78,7 +78,7 @@ This paper presents some of the major denial of service vulnerabilities in Node.
 
 
 - APM - Application Performance Management
-- CEP - Brazilian ZIP code
+- CEP - Brazilian Postal code
 - CPS - Content Security Policy
 - CPU - Central Processing Unit
 - DNS - Domain Name System
